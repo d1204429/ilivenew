@@ -13,14 +13,6 @@
         <span>${{ formatPrice(subtotal) }}</span>
       </div>
 
-      <!-- 折扣區塊 -->
-      <div class="discount-section" v-if="discount > 0">
-        <div class="price-row discount">
-          <span>折扣金額</span>
-          <span>-${{ formatPrice(discount) }}</span>
-        </div>
-      </div>
-
       <!-- 運費計算 -->
       <div class="shipping-section">
         <div class="price-row">
@@ -32,28 +24,7 @@
           再購買 ${{ formatPrice(remainingForFreeShipping) }} 即可享免運優惠
         </div>
       </div>
-
-      <!-- 優惠碼輸入 -->
-      <div class="coupon-section">
-        <div class="coupon-input">
-          <input
-              type="text"
-              v-model="couponCode"
-              placeholder="請輸入優惠碼"
-              :disabled="appliedCoupon"
-          >
-          <button
-              @click="applyCoupon"
-              :disabled="!couponCode || appliedCoupon"
-          >
-            {{ appliedCoupon ? '已套用' : '套用' }}
-          </button>
-        </div>
-        <div class="coupon-message" v-if="couponMessage">
-          {{ couponMessage }}
-        </div>
-      </div>
-
+      
       <!-- 總計金額 -->
       <div class="total-section">
         <div class="price-row total">
@@ -81,7 +52,7 @@
     </div>
 
     <!-- 付款方式提示 -->
-    <div class="payment-methods">
+    <!-- <div class="payment-methods">
       <h3>付款方式</h3>
       <div class="payment-icons">
         <i class="fab fa-cc-visa"></i>
@@ -90,63 +61,74 @@
         <i class="fab fa-apple-pay"></i>
         <i class="fab fa-google-pay"></i>
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { defineProps, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { useStore } from 'vuex'
+
+// 接收 props
+const props = defineProps({
+  cartItems: {
+    type: Array,
+    required: true,
+    default: () => []
+  },
+  prodItems:{
+    type: Array,
+    required: true,
+    default: () => []
+  }
+});
 
 const router = useRouter()
-    const store = useStore()
-    const couponCode = ref('')
-    const couponMessage = ref('')
-    const appliedCoupon = ref(false)
 
-    // 計算屬性
-    const subtotal = computed(() => store.getters['cart/cartSubtotal'])
-    const discount = computed(() => store.getters['cart/cartDiscount'])
-    const shipping = computed(() => {
-      return subtotal.value >= 1000 ? 0 : 60
-    })
-    const total = computed(() => {
-      return subtotal.value - discount.value + shipping.value
-    })
-    const totalItems = computed(() => store.getters['cart/cartItemCount'])
-    const remainingForFreeShipping = computed(() => {
-      return subtotal.value >= 1000 ? 0 : 1000 - subtotal.value
-    })
+// 計算屬性
+const totalItems = computed(() => 
+props.cartItems.reduce((sum, item) => sum + (item.quantity || 0), 0))
 
-    // 方法
-    const formatPrice = (price) => {
-      return price.toLocaleString('zh-TW')
-    }
-
-    const applyCoupon = async () => {
-      try {
-        const result = await store.dispatch('cart/applyCoupon', couponCode.value)
-        if (result.success) {
-          appliedCoupon.value = true
-          couponMessage.value = '優惠碼套用成功！'
-        } else {
-          couponMessage.value = result.message || '優惠碼無效'
-        }
-      } catch (error) {
-        couponMessage.value = '優惠碼套用失敗，請稍後再試'
+const subtotal= computed(() =>{
+  let total = 0
+  for (const item of props.cartItems) {
+    const product = props.prodItems.find(prod => prod.productId === item.productId)
+    //console.log(product)
+    if (product) {
+      if (product.promotionalPrice < product.originalPrice) {
+        total += product.promotionalPrice * (item.quantity || 0)
+      } else {
+        total += product.originalPrice * (item.quantity || 0)
       }
     }
+  }
+  return total
+})
 
-    const proceedToCheckout = () => {
-      if (totalItems.value > 0) {
-        router.push('/checkout')
-      }
-    }
+const shipping = computed(() => {
+  return subtotal.value >= 1000 ? 0 : 60
+})
 
-    const continueShopping = () => {
-      router.push('/products')
-    }
+const total = computed(() => {
+  return subtotal.value + shipping.value
+})
+
+const remainingForFreeShipping = computed(() => {
+  return subtotal.value >= 1000 ? 0 : 1000 - subtotal.value
+})
+
+// 方法
+const formatPrice = (price) => {
+  return price?.toLocaleString('zh-TW') || '0'
+}
+
+const proceedToCheckout = () => {
+  router.push('/checkout')
+}
+
+const continueShopping = () => {
+  router.push('/products')
+}
 </script>
 
 <style scoped>

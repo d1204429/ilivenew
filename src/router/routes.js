@@ -46,35 +46,35 @@ export default [
             title: '購物車'
         }
     },
-    // {
-    //     path: '/checkout',
-    //     name: 'Checkout',
-    //     component: () => import('@/views/cart/CheckoutView.vue'),
-    //     meta: {
-    //         requiresAuth: true,
-    //         title: '結帳',
-    //         validateCart: true
-    //     }
-    // },
-    // {
-    //     path: '/orders',
-    //     name: 'Orders',
-    //     component: () => import('@/views/order/OrderHistoryView.vue'),
-    //     meta: {
-    //         requiresAuth: true,
-    //         title: '訂單記錄'
-    //     }
-    // },
-    // {
-    //     path: '/order/:id',
-    //     name: 'OrderDetail',
-    //     component: () => import('@/views/order/OrderDetailView.vue'),
-    //     props: route => ({ orderId: parseInt(route.params.id) }),
-    //     meta: {
-    //         requiresAuth: true,
-    //         title: '訂單詳情'
-    //     }
-    // },
+    {
+        path: '/checkout',
+        name: 'Checkout',
+        component: () => import('@/views/cart/CheckoutView.vue'),
+        meta: {
+            requiresAuth: true,
+            title: '結帳',
+            validateCart: true
+        }
+    },
+    {
+        path: '/orders',
+        name: 'Orders',
+        component: () => import('@/views/order/OrderHistoryView.vue'),
+        meta: {
+            requiresAuth: true,
+            title: '訂單記錄'
+        }
+    },
+    {
+        path: '/order/:id',
+        name: 'OrderDetail',
+        component: () => import('@/views/order/OrderDetailView.vue'),
+        props: route => ({ orderId: parseInt(route.params.id) }),
+        meta: {
+            requiresAuth: true,
+            title: '訂單詳情'
+        }
+    },
     {
         path: '/login',
         name: 'Login',

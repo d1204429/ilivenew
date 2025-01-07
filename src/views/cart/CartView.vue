@@ -8,23 +8,39 @@
     <!-- 購物車內容區 -->
     <div class="cart-container">
       <div  v-if="cartItems.length > 0">
-          <button class="text-gray-600 hover:text-red-600"
-          @click="deleteCart">
-            清空購物車
-          </button>
-        </div>
+        <button class="text-gray-600 hover:text-red-600"
+        @click="deleteCart">清空購物車</button>
+      </div>
       <!-- 購物車列表 -->
-        <CartList :cart-items="cartItems"
-        @remove-item="removeItem"/>
-
-        <!-- 購物車摘要 -->
-        <div class="cart-summary-container" v-if="cartItems.length > 0">
-          <!-- <CartSummary
-              :cart-items="cartItems"
-              :total="calculateTotal"
-              @checkout="proceedToCheckout"
-          /> -->
+      <div>
+        <div v-if="!loading && cartItems.length > 0">
+          <CartList
+          v-if="isDataReady"
+          :cart-items="cartItems"
+          :prod-items="prodItems"
+          @remove-item="removeItem"/>
         </div>
+        <div v-else-if="!loading && cartItems.length == 0" class="empty-cart">
+          <i class="fas fa-shopping-cart"></i>
+          <p>您的購物車是空的</p>
+          <router-link to="/products" class="continue-shopping">
+            繼續購物
+          </router-link>
+        </div>
+        <!-- 載入中提示 -->
+         <div v-else class="loading">
+          <i class="fas fa-spinner fa-spin"></i>
+          載入中...
+        </div>
+      </div>
+      <!-- 購物車摘要 -->
+      <div class="cart-summary-container" v-if="cartItems.length > 0">
+        <CartSummary
+        v-if="isDataReady"
+        :cart-items="cartItems"
+        :prod-items="prodItems"
+        :total="calculateTotal"/>
+      </div>
     </div>
   </div>
 </template>
@@ -36,18 +52,26 @@ import { useStore } from 'vuex'
 import CartList from '@/components/cart/CartList.vue'
 import CartSummary from '@/components/cart/CartSummary.vue'
 import {getCartItems, delCartItem, clearCart} from '@/services/cart'
-
+import { getProductInfo } from '@/services/products';
 
 const router = useRouter()
 const store = useStore()
 const loading = ref(true)
 const cartItems = ref([])
+const prodItems = ref([])
 
 // 計算總金額
 const calculateTotal = computed(() => {
   return cartItems.value.reduce((total, item) => {
     return total + (item.price * item.quantity)
   }, 0)
+})
+
+// 檢查數據是否都準備好
+const isDataReady = computed(() => {
+  return cartItems.value?.length > 0 && 
+         prodItems.value?.length > 0 &&
+         cartItems.value.length === prodItems.value.length
 })
 
 // 獲取購物車商品
@@ -57,9 +81,26 @@ const fetchCartItems = async () => {
       router.push('/login')
     }
     loading.value = true
-    console.log(store.state.accessToken)
+    //console.log(store.state.accessToken)
     const data = await getCartItems(store.state.accessToken)
     cartItems.value = data
+    
+  } catch (error) {
+    console.error('獲取購物車失敗:', error)
+  } finally {
+    loading.value = false
+  }
+}
+
+//商品車
+const fetchProdItems = async () => {
+  try {
+    loading.value = true
+    if(cartItems.value && cartItems.value.length > 0){
+      const promises = cartItems.value.map(item => getProductInfo(item.productId))
+      const results = await Promise.all(promises)
+      prodItems.value = results
+    }
   } catch (error) {
     console.error('獲取購物車失敗:', error)
   } finally {
@@ -78,7 +119,7 @@ const deleteCartItemQty = async (cartItemId) =>{
   if (!response) {
         alert(error.message || '刪除購物車項目失敗')
       }else{
-        fetchCartItems()
+        initData()
       }
 }
 
@@ -92,17 +133,24 @@ const clearCartItem = async (cartId) =>{
   if (!response) {
         alert(error.message || '刪除購物車失敗')
       }else{
-        fetchCartItems()
+        initData()
       }
 }
 
-// 前往結帳
-const proceedToCheckout = () => {
-  router.push('/checkout')
+const initData = async () => {
+  loading.value = true
+  try {
+    await fetchCartItems()
+    await fetchProdItems()
+  } catch (error) {
+    console.error('初始化資料失敗:', error)
+  } finally {
+    loading.value = false
+  }
 }
 
 onMounted(() => {
-  fetchCartItems()
+  initData()
 })
 </script>
 
@@ -127,6 +175,38 @@ onMounted(() => {
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+
+.empty-cart {
+  text-align: center;
+  padding: 3rem;
+}
+
+.empty-cart i {
+  font-size: 4rem;
+  color: #ccc;
+  margin-bottom: 1rem;
+}
+
+.continue-shopping {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  background-color: var(--primary-color);
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  margin-top: 1rem;
+}
+
+.loading {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+}
+
+.loading i {
+  margin-right: 0.5rem;
+}
+
 
 @media (max-width: 768px) {
   .cart-view {
