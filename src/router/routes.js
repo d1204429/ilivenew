@@ -8,15 +8,15 @@ export default [
             keepAlive: true
         }
     },
-    // {
-    //     path: '/products',
-    //     name: 'Products',
-    //     component: () => import('@/views/product/ProductListView.vue'),
-    //     meta: {
-    //         title: '商品列表',
-    //         keepAlive: true
-    //     }
-    // },
+    {
+        path: '/products',
+        name: 'Products',
+        component: () => import('@/views/product/ProductListView.vue'),
+        meta: {
+            title: '商品列表',
+            keepAlive: true
+        }
+    },
     // {
     //     path: '/category/:id',
     //     name: 'Category',
@@ -84,15 +84,15 @@ export default [
             hideForAuth: true
         }
     },
-    // {
-    //     path: '/register',
-    //     name: 'Register',
-    //     component: () => import('@/views/user/RegisterView.vue'),
-    //     meta: {
-    //         title: '註冊',
-    //         hideForAuth: true
-    //     }
-    // },
+    {
+        path: '/register',
+        name: 'Register',
+        component: () => import('@/views/user/RegisterView.vue'),
+        meta: {
+            title: '註冊',
+            hideForAuth: true
+        }
+    },
     {
         path: '/profile',
         name: 'Profile',
