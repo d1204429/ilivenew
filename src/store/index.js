@@ -21,25 +21,24 @@ const storeOptions = {
         },
         updateUserName(state, payload){
             state.userName = payload
-        },
+        }, clearUserData(state) {
+            state.accessToken = ""
+            state.refreshToken = ""
+            state.userId = ""
+            state.userName = ""
+        }
     },
     //異步處理動作
     actions:{
-        async loginUser({commit}, response) {
-            try {
-                if (response?.accessToken) {
-                    commit('updateAccessToken', response.accessToken)
-                    commit('updateRefreshToken', response.refreshToken)
-                    commit('updateUserId', response.user.userId)
-                    commit('updateUserName', response.user.username)
-                    return
-                }
-                throw new Error('Login failed: No access token received')
-            } catch (error) {
-                console.error('Login error:', error)
-                throw error
-            }
-        },
+        logoutUser({ commit }) {
+            // 清除 store 中的用戶數據
+            commit('clearUserData')
+            // 清除 localStorage 中可能存在的數據
+            localStorage.removeItem('accessToken')
+            localStorage.removeItem('refreshToken')
+            localStorage.removeItem('userId')
+            localStorage.removeItem('userName')
+        }
     },
 }
 

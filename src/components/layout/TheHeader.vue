@@ -101,7 +101,7 @@
               <router-link to="/orders" class="dropdown-item">訂單記錄</router-link>
               <button
                   class="dropdown-item"
-
+                  @click="handleLogout"
               >登出</button>
               <!-- @click="handleLogout" -->
             </div>
@@ -128,8 +128,8 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useStore } from 'vuex'
-// import { useRouter } from 'vue-router'
-
+import { useRouter } from 'vue-router'
+const router = useRouter()
 const store = useStore()
     // const router = useRouter()
 
@@ -212,22 +212,16 @@ onUnmounted(() => {
     //   }
     // }
 
-    // const handleLogout = async () => {
-    //   try {
-    //     await store.dispatch('auth/logout')
-    //     router.push('/login')
-    //     store.dispatch('app/setSuccess', {
-    //       message: '已成功登出',
-    //       duration: 2000
-    //     })
-    //   } catch (error) {
-    //     store.dispatch('app/setError', {
-    //       message: '登出失敗，請稍後再試',
-    //       type: 'error',
-    //       duration: 3000
-    //     })
-    //   }
-    // }
+const handleLogout = async () => {
+  try {
+    // 調用 store 的登出 action
+    await store.dispatch('logoutUser')
+    // 導航到登入頁面
+    router.push('/login')
+  } catch (error) {
+    console.error('登出錯誤:', error)
+  }
+}
 
     // const handleSearch = () => {
     //   const trimmedKeyword = searchKeyword.value.trim()

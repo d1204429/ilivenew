@@ -89,10 +89,12 @@ import { useRouter } from 'vue-router'
 import BaseLoading from '@/components/common/BaseLoading.vue'
 import { fullName, email, phoneNumber, address } from '@/utils/validators'
 //import AuthService from '@/services/auth.service'
-
+import { getUser, updateUser } from '@/services/users'
 // Lifecycle Hooks
 //onMounted(initializeProfile)
-
+onMounted(() => {
+  initializeProfile()
+})
 const store = useStore()
     const router = useRouter()
 
@@ -169,13 +171,13 @@ const store = useStore()
     }
 
     // Form Actions
-    const startEditing = () => {
-      // editedProfile.value = { ...currentUser.value }
-      // originalProfile.value = { ...currentUser.value }
-      // isEditing.value = true
-      // errors.value = {}
-      // globalError.value = ''
-    }
+const startEditing = () => {
+  editedProfile.value = { ...currentUser.value }
+  originalProfile.value = { ...currentUser.value }
+  isEditing.value = true
+  errors.value = {}
+  globalError.value = ''
+}
 
     const handleCancel = () => {
       if (hasChanges.value) {
@@ -188,88 +190,104 @@ const store = useStore()
       globalError.value = ''
     }
 
-    const handleSave = async () => {
-      if (!validateForm()) return
+// ProfileView.vue 中的 handleSave 函數
+const handleSave = async () => {
+  console.log('Starting save process')
+  if (!validateForm()) {
+    console.log('Form validation failed')
+    return
+  }
 
-      // try {
-      //   loading.value = true
-      //   globalError.value = ''
+  try {
+    loading.value = true
+    globalError.value = ''
 
-      //   const response = await AuthService.updateProfile(editedProfile.value)
-      //   if (response) {
-      //     isEditing.value = false
-      //     originalProfile.value = { ...response }
-      //     editedProfile.value = { ...response }
-      //     currentUser.value = response
-      //     store.commit('auth/SET_SUCCESS_MESSAGE', '個人資料更新成功')
-      //   }
-      // } catch (error) {
-      //   if (error.response?.status === 401) {
-      //     try {
-      //       await AuthService.refreshAccessToken()
-      //       if (retryCount.value < MAX_RETRIES) {
-      //         retryCount.value++
-      //         return handleSave()
-      //       }
-      //     } catch (refreshError) {
-      //       globalError.value = '登入已過期，請重新登入'
-      //       router.push('/login')
-      //     }
-      //   } else {
-      //     globalError.value = error.message || '更新失敗，請稍後再試'
-      //   }
-      // } finally {
-      //   loading.value = false
-      // }
+    console.log('Preparing data for update:', editedProfile.value)
+
+    const response = await updateUser(
+        store.state.userId,
+        editedProfile.value,
+        store.state.accessToken
+    )
+
+    if (response) {
+      console.log('Update successful:', response)
+      isEditing.value = false
+      originalProfile.value = { ...response }
+      editedProfile.value = { ...response }
+      currentUser.value = response
+
+      // Show success message
+      store.commit('SET_SUCCESS_MESSAGE', '個人資料更新成功')
+
+      // Refresh user data
+      await initializeProfile()
     }
+
+  } catch (error) {
+    console.error('Save failed:', error)
+    if (error.response?.status === 401) {
+      globalError.value = '登入已過期，請重新登入'
+      router.push('/login')
+    } else {
+      globalError.value = error.message || '更新失敗，請稍後再試'
+    }
+  } finally {
+    loading.value = false
+  }
+}
 
     // Initialize Profile Data
-    const initializeProfile = async () => {
-      // try {
-      //   loading.value = true
-      //   globalError.value = ''
+// ProfileView.vue 中的 initializeProfile 函數
+const initializeProfile = async () => {
+  console.log('Initializing profile')
+  try {
+    loading.value = true
+    globalError.value = ''
 
-      //   if (!AuthService.isAuthenticated()) {
-      //     router.push({
-      //       path: '/login',
-      //       query: { redirect: router.currentRoute.value.fullPath }
-      //     })
-      //     return
-      //   }
-
-      //   const userData = AuthService.getCurrentUser()
-      //   if (userData) {
-      //     currentUser.value = userData
-      //     originalProfile.value = { ...userData }
-      //     editedProfile.value = { ...userData }
-      //     retryCount.value = 0
-      //   } else {
-      //     // 如果本地沒有資料，則從伺服器獲取
-      //     const profileData = await AuthService.getProfile()
-      //     if (profileData) {
-      //       currentUser.value = profileData
-      //       originalProfile.value = { ...profileData }
-      //       editedProfile.value = { ...profileData }
-      //       retryCount.value = 0
-      //     }
-      //   }
-      // } catch (error) {
-      //   console.error('載入個人資料時發生錯誤:', error)
-      //   globalError.value = error.message || '無法載入用戶資料'
-
-      //   if (error.response?.status === 401) {
-      //     router.push({
-      //       path: '/login',
-      //       query: {
-      //         redirect: router.currentRoute.value.fullPath,
-      //         error: 'session_expired'
-      //       }
-      //     })
-      //   }
-      // } finally {
-      //   loading.value = false
-      // }
+    if (!isAuthenticated.value) {
+      console.log('User not authenticated, redirecting to login')
+      router.push({
+        path: '/login',
+        query: { redirect: router.currentRoute.value.fullPath }
+      })
+      return
     }
+
+    const userId = store.state.userId
+    const token = store.state.accessToken
+    console.log('Getting user data for ID:', userId)
+
+    const userData = await getUser(userId, token)
+    if (userData) {
+      console.log('User data received:', userData)
+      currentUser.value = userData
+      originalProfile.value = { ...userData }
+      editedProfile.value = { ...userData }
+      retryCount.value = 0
+    } else {
+      console.log('No user data received')
+      globalError.value = '無法獲取用戶資料'
+    }
+
+  } catch (error) {
+    console.error('Profile initialization error:', error)
+    globalError.value = error.message || '無法載入用戶資料'
+
+    if (error.response?.status === 401) {
+      console.log('Session expired, redirecting to login')
+      router.push({
+        path: '/login',
+        query: {
+          redirect: router.currentRoute.value.fullPath,
+          error: 'session_expired'
+        }
+      })
+    }
+  } finally {
+    loading.value = false
+  }
+}
 
     // Watchers
     watch(() => editedProfile.value, (newValue, oldValue) => {
