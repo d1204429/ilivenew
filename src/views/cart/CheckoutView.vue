@@ -38,7 +38,7 @@
         </div>
       </div>
     </div>
-    
+
     <!-- 訂單摘要 -->
     <div class="order-summary" v-if="isDataReady">
       <h2>訂單摘要</h2>
@@ -276,7 +276,7 @@ const creditPayment = async () => {
 
 // 檢查數據是否都準備好
 const isDataReady = computed(() => {
-  return cartItems.value?.length > 0 && 
+  return cartItems.value?.length > 0 &&
          prodItems.value?.length > 0 &&
          cartItems.value.length === prodItems.value.length
 })
@@ -291,7 +291,7 @@ const getPrice = (promt, origin) => {
 // 圖片處理方法
 const getImageUrl = (imagePath) => {
   if (!imagePath) {
-    return 
+    return
   }
   return imagePath.replace('/image/', '/static/image/')
 }
@@ -316,7 +316,7 @@ const fetchCartItems = async () => {
     //console.log(store.state.accessToken)
     const data = await getCartItems(store.state.accessToken)
     cartItems.value = data
-    
+
   } catch (error) {
     console.error('獲取購物車失敗:', error)
   } finally {
@@ -327,13 +327,15 @@ const fetchCartItems = async () => {
 const fetchProdItems = async () => {
   try {
     if(cartItems.value && cartItems.value.length > 0){
-      const promises = cartItems.value.map(item => getProductInfo(item.productId))
-      const results = await Promise.all(promises)
-      prodItems.value = results
+      // 獲取所有商品信息
+      const response = await getProductInfo()
+      // 過濾出購物車中的商品
+      prodItems.value = response.filter(product =>
+          cartItems.value.some(cartItem => cartItem.productId === product.productId)
+      )
     }
   } catch (error) {
-    console.error('獲取購物車失敗:', error)
-  } finally {
+    console.error('獲取商品資訊失敗:', error)
   }
 }
 
