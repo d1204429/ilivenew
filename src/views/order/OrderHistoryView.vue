@@ -18,7 +18,7 @@
         <div class="order-header">
           <span class="order-number">訂單編號: {{ order.orderId }}</span>
           <span class="order-date">下單時間: {{ formatDate(order.createdAt) }}</span>
-          <span class="order-status">狀態: {{ order.statusId }}</span>
+          <span class="order-status">狀態: {{ getOrderStatus(order.statusId) }}</span>
         </div>
         <div class="order-content">
           <div class="product-list">
@@ -85,6 +85,18 @@ import {getOrder} from '@/services/order';
 
 const store = useStore()
 const router = useRouter()
+// 訂單狀態對應
+const orderStatusMap = {
+  1: '待付款',
+  2: '已付款',
+  3: '已出貨',
+  4: '已完成',
+  5: '已取消'
+}
+
+const getOrderStatus = (statusId) => {
+  return orderStatusMap[statusId] || '未知狀態'
+}
 
 // 資料狀態
 const orders = ref([])
