@@ -116,30 +116,40 @@ const btnDisable = ref(true)
 // 圖片處理方法
 const getImageUrl = (imagePath) => {
   if (!imagePath) {
-    return 
+    return
   }
   return imagePath.replace('/image/', '/static/image/')
 }
-    
+
 
     // API 方法
-    const fetchProduct = async () => {
-      try {
-        loading.value = true
-        const data = await getProductInfo(route.params.id)
-        product.value = data
-        
-        if(product.value.promotionalPrice < product.value.originalPrice){
-          isPricePromt.value = true
-        }
-        
-        btnDisable.value = product.availableStock < 0
-      } catch (err) {
-        console.error('獲取商品資訊失敗:', err)
-      } finally {
-        loading.value = false
-      }
+const fetchProduct = async () => {
+  try {
+    loading.value = true
+    const productId = route.params.id
+    console.log('Fetching product id:', productId) // 調試用
+
+    const response = await getProductInfo()
+    // 從回傳的所有產品中找到匹配的產品
+    const productData = response.find(p => p.productId === parseInt(productId))
+
+    if (productData) {
+      product.value = productData
+      // 檢查是否有促銷價格
+      isPricePromt.value = productData.promotionalPrice < productData.originalPrice
+      // 更新按鈕狀態
+      btnDisable.value = productData.availableStock <= 0
+    } else {
+      console.error('Product not found')
+      // 可以添加錯誤處理
     }
+
+  } catch (err) {
+    console.error('獲取商品資訊失敗:', err)
+  } finally {
+    loading.value = false
+  }
+}
 
     const increaseQuantity = () => {
       if (quantity.value < product.value.availableStock && quantity.value <10) {
