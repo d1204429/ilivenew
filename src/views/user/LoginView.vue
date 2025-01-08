@@ -1,6 +1,12 @@
 <template>
   <div class="login-view">
     <div class="login-container">
+      <div class="back-link">
+        <a @click="handleBack">
+          <i class="fas fa-arrow-left"></i> 返回
+        </a>
+      </div>
+
       <h2>登入 iLive</h2>
 
       <form @submit.prevent="handleSubmit" class="login-form">
@@ -132,6 +138,13 @@ import BaseButton from '@/components/common/BaseButton.vue'
 
 const router = useRouter()
     const store = useStore()
+    const handleBack = () => {
+      if (window.history.length > 2) {
+        router.go(-1)
+      } else {
+        router.push('/')
+      }
+    }
 
     // Reactive State
     const isLoading = ref(false)
@@ -536,4 +549,25 @@ h2 {
     transform: translateY(0);
   }
 }
+.back-link {
+  margin-bottom: 1rem;
+}
+
+.back-link a {
+  display: inline-flex;
+  align-items: center;
+  color: #666;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.back-link a:hover {
+  color: #4299e1;
+}
+
+.back-link i {
+  margin-right: 0.5rem;
+}
+
 </style>
