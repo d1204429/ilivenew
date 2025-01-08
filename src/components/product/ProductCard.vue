@@ -21,7 +21,7 @@
     </div>
 
     <!-- 商品內容區塊 -->
-    <div class="product-content">
+    <div class="product-content ">
       <h3 class="product-title" :title="product.name">
         {{ truncateText(product.name, 20) }}
       </h3>
@@ -192,7 +192,7 @@ const router = useRouter()
         addingToCart.value = false
       }
     }
-    
+
     const handleViewDetail = () => {
       router.push({
         name: 'ProductDetail',
@@ -279,7 +279,7 @@ const router = useRouter()
 }
 
 .product-content {
-  padding: 1rem;
+  padding: 10px;
 }
 
 .product-title {
