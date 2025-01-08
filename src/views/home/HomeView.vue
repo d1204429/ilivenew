@@ -5,9 +5,12 @@
       <button class="carousel-control left" @click="prevSlide">
         <i class="fas fa-chevron-left"></i>
       </button>
-      <!--   -->
       <div class="carousel-inner2" :style="{ transform: `translateX(-${currentSlide * 100}%)` }">
-        <div v-for="(slide, index) in carouselSlides" :key="index" class="carousel-slide">
+        <div v-for="(slide, index) in carouselSlides"
+             :key="index"
+             class="carousel-slide"
+             :class="{ 'cursor-pointer': slide.link }"
+             @click="handleSlideClick(slide)">
           <img :src="slide.image" :alt="slide.caption">
           <div class="carousel-caption">{{ slide.caption }}</div>
         </div>
@@ -50,9 +53,7 @@
              class="product-promotion-card">
           <ProductCard
               :product="product"
-              
           />
-          <!-- :promotional-price="product.promotionalPrice" -->
           <div class="promotion-tag">
             特惠價格
           </div>
@@ -64,16 +65,14 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { getPromotions } from '@/services/promotion'
 import { getPromotionProduct } from '@/services/products'
-// import { useRouter } from 'vue-router'
-// import { useStore } from 'vuex'
 import ProductCard from '@/components/product/ProductCard.vue'
 
-//const router = useRouter()
-//const store = useStore()
+const router = useRouter()
 
-//初始get promotionData
+// 初始化獲取促銷數據
 onMounted(() => {
   getPromotionsData()
 })
@@ -83,17 +82,28 @@ const currentSlide = ref(0)
 const carouselSlides = ref([
   {
     image: '/src/assets/carousel/ilive1.webp',
-    caption: '新品上市'
+    caption: '全館免運',
+    link: null
   },
   {
     image: '/src/assets/carousel/ilive2.webp',
-    caption: '限時特惠'
+    caption: '限時特惠',
+    link: null
   },
   {
     image: '/src/assets/carousel/login.webp',
-    caption: '立即登入'
+    caption: '立即登入',
+    link: '/login'  // 設定登入頁面的路由
   }
 ])
+
+// 處理輪播圖點擊
+const handleSlideClick = (slide) => {
+  if (slide.link) {
+    router.push(slide.link)
+  }
+}
+
 // 輪播控制
 const prevSlide = () => {
   currentSlide.value = (currentSlide.value - 1 + carouselSlides.value.length) % carouselSlides.value.length
@@ -103,10 +113,11 @@ const nextSlide = () => {
   currentSlide.value = (currentSlide.value + 1) % carouselSlides.value.length
 }
 
-//促銷活動
+// 促銷活動
 const activePromotions = ref([])
 // 商品
 const productPromotions = ref([])
+
 // 獲取促銷活動和商品資料
 const getPromotionsData = async () => {
   try {
@@ -119,29 +130,14 @@ const getPromotionsData = async () => {
 
 // 格式化日期
 const formatDate = (dateString) => {
-return new Date(dateString).toLocaleDateString('zh-TW')
+  return new Date(dateString).toLocaleDateString('zh-TW')
 }
 
 // 格式化折扣顯示
 const formatDiscount = (type, value) => {
   return type === 'PERCENTAGE' ? `${value}% OFF` : `$${value} 折扣`
 }
-
-    // 加入購物車
-    const addToCart = async (product) => {
-      // try {
-      //   await store.dispatch('cart/addToCart', {
-      //     productId: product.productId,
-      //     quantity: 1
-      //   })
-      //   store.dispatch('app/setSuccess', '成功加入購物車')
-      // } catch (error) {
-      //   store.dispatch('app/setError', '加入購物車失敗')
-      // }
-    }
-
 </script>
-
 
 <style scoped>
 .home-view {
@@ -169,6 +165,10 @@ const formatDiscount = (type, value) => {
   position: relative;
   flex-shrink: 0;
   height: auto;
+}
+
+.cursor-pointer {
+  cursor: pointer;
 }
 
 .carousel-slide img {

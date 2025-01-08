@@ -1,7 +1,7 @@
 <template>
   <div class="product-card" :class="{ 'out-of-stock': !product.availableStock }">
-    <!-- 商品圖片區塊 -->
-    <div class="product-image-container">
+    <!-- 商品圖片區塊 - 保持可點擊 -->
+    <div class="product-image-container cursor-pointer" @click="handleViewDetail">
       <img
           :src="getProductImageUrl"
           :alt="product.name"
@@ -21,11 +21,8 @@
     </div>
 
     <!-- 商品內容區塊 -->
-    <div class="product-content ">
-      <h3 class="product-title" :title="product.name">
-        {{ truncateText(product.name, 20) }}
-      </h3>
-
+    <div class="product-content">
+      <!-- 品牌和分類資訊 - 從可點擊區域中移出 -->
       <div class="product-meta">
         <span v-if="product.brand" class="brand">
           <i class="fas fa-tag"></i>
@@ -37,18 +34,25 @@
         </span>
       </div>
 
-      <div class="product-price" :class="{ 'has-discount': hasDiscount }">
-        <span class="current-price">
-          NT$ {{ formatPrice(product.promotionalPrice || product.price) }}
-        </span>
-        <span v-if="hasDiscount" class="original-price">
-          NT$ {{ formatPrice(product.originalPrice) }}
-        </span>
-      </div>
+      <!-- 可點擊內容區域 -->
+      <div class="clickable-content cursor-pointer" @click="handleViewDetail">
+        <h3 class="product-title" :title="product.name">
+          {{ truncateText(product.name, 20) }}
+        </h3>
 
-      <p v-if="product.description" class="product-description">
-        {{ truncateText(product.description, 50) }}
-      </p>
+        <div class="product-price" :class="{ 'has-discount': hasDiscount }">
+          <span class="current-price">
+            NT$ {{ formatPrice(product.promotionalPrice || product.price) }}
+          </span>
+          <span v-if="hasDiscount" class="original-price">
+            NT$ {{ formatPrice(product.originalPrice) }}
+          </span>
+        </div>
+
+        <p v-if="product.description" class="product-description">
+          {{ truncateText(product.description, 50) }}
+        </p>
+      </div>
 
       <div class="product-stock" :class="stockStatusClass">
         <i :class="stockStatusIcon"></i>
@@ -64,15 +68,6 @@
         >
           <i class="fas fa-cart-plus"></i>
           {{ cartButtonText }}
-        </BaseButton>
-
-        <BaseButton
-            class="detail-btn"
-            variant="outline"
-            @click="handleViewDetail"
-        >
-          <i class="fas fa-info-circle"></i>
-          商品詳情
         </BaseButton>
       </div>
     </div>
@@ -94,111 +89,111 @@ const props = defineProps({
 })
 
 const router = useRouter()
-    const store = useStore()
-    const imageLoading = ref(true)
-    const addingToCart = ref(false)
-    const imageError = ref(false)
+const store = useStore()
+const imageLoading = ref(true)
+const addingToCart = ref(false)
+const imageError = ref(false)
 
-    // 計算屬性
-    const getProductImageUrl = computed(() => {
-      if (imageError.value || !props.product.imageUrl) {
-        return
-      }
-      const imageUrl = props.product.imageUrl
-      return imageUrl.replace('/image/', '/static/image/')
-    })
+// 計算屬性
+const getProductImageUrl = computed(() => {
+  if (imageError.value || !props.product.imageUrl) {
+    return
+  }
+  const imageUrl = props.product.imageUrl
+  return imageUrl.replace('/image/', '/static/image/')
+})
 
-    const showBadges = computed(() =>
-        props.product.isNew ||
-        props.product.isOnSale ||
-        props.product.discount
-    )
+const showBadges = computed(() =>
+    props.product.isNew ||
+    props.product.isOnSale ||
+    props.product.discount
+)
 
-    const hasDiscount = computed(() =>
-        props.product.originalPrice &&
-        props.product.originalPrice > props.product.price
-    )
+const hasDiscount = computed(() =>
+    props.product.originalPrice &&
+    props.product.originalPrice > props.product.price
+)
 
-    const stockStatusClass = computed(() => ({
-      'in-stock': props.product.availableStock > 10,
-      'low-stock': props.product.availableStock > 0 && props.product.availableStock <= 10,
-      'out-of-stock': !props.product.availableStock
-    }))
+const stockStatusClass = computed(() => ({
+  'in-stock': props.product.availableStock > 10,
+  'low-stock': props.product.availableStock > 0 && props.product.availableStock <= 10,
+  'out-of-stock': !props.product.availableStock
+}))
 
-    const stockStatusIcon = computed(() => {
-      if (!props.product.availableStock) return 'fas fa-times-circle'
-      if (props.product.availableStock <= 10) return 'fas fa-exclamation-circle'
-      return 'fas fa-check-circle'
-    })
+const stockStatusIcon = computed(() => {
+  if (!props.product.availableStock) return 'fas fa-times-circle'
+  if (props.product.availableStock <= 10) return 'fas fa-exclamation-circle'
+  return 'fas fa-check-circle'
+})
 
-    const stockStatusText = computed(() => {
-      if (!props.product.availableStock) return '已售完'
-      if (props.product.availableStock <= 10) return `剩餘 ${props.product.availableStock} 件`
-      return '現貨充足'
-    })
+const stockStatusText = computed(() => {
+  if (!props.product.availableStock) return '已售完'
+  if (props.product.availableStock <= 10) return `剩餘 ${props.product.availableStock} 件`
+  return '現貨充足'
+})
 
-    const cartButtonText = computed(() => {
-      if (addingToCart.value) return '處理中...'
-      if (!props.product.availableStock) return '已售完'
-      return '加入購物車'
-    })
+const cartButtonText = computed(() => {
+  if (addingToCart.value) return '處理中...'
+  if (!props.product.availableStock) return '已售完'
+  return '加入購物車'
+})
 
-    const canAddToCart = computed(() =>
-        props.product.availableStock > 0 && !addingToCart.value
-    )
+const canAddToCart = computed(() =>
+    props.product.availableStock > 0 && !addingToCart.value
+)
 
-    // 方法
-    const formatPrice = (price) => {
-      if (!price) return '0'
-      return new Intl.NumberFormat('zh-TW', {
-        style: 'decimal',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0
-      }).format(price)
+// 方法
+const formatPrice = (price) => {
+  if (!price) return '0'
+  return new Intl.NumberFormat('zh-TW', {
+    style: 'decimal',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(price)
+}
+
+const truncateText = (text, length) => {
+  if (!text) return ''
+  return text.length > length ? `${text.substring(0, length)}...` : text
+}
+
+const handleImageLoad = () => {
+  imageLoading.value = false
+}
+
+const handleImageError = (event) => {
+  console.error('Image load failed:', event)
+  imageError.value = true
+  imageLoading.value = false
+}
+
+const handleAddToCart = async () => {
+  if (!canAddToCart.value) return
+  addingToCart.value = true
+  try {
+    if (!store.state.accessToken) {
+      router.push('/login')
+      return
     }
-
-    const truncateText = (text, length) => {
-      if (!text) return ''
-      return text.length > length ? `${text.substring(0, length)}...` : text
+    const response = await addCart(props.product.productId, 1, store.state.accessToken)
+    if (response) {
+      alert('已加入購物車')
+    } else {
+      alert(error.message || '加入購物車失敗')
     }
+  } catch (error) {
+    alert(error.message || '加入購物車失敗')
+  } finally {
+    addingToCart.value = false
+  }
+}
 
-    const handleImageLoad = () => {
-      imageLoading.value = false
-    }
-
-    const handleImageError = (event) => {
-      console.error('Image load failed:', event)
-      imageError.value = true
-      imageLoading.value = false
-    }
-
-    const handleAddToCart = async () => {
-      if (!canAddToCart.value) return
-      addingToCart.value = true
-      try{
-        if (!store.state.accessToken) {
-          router.push('/login')
-          return
-        }
-        const response = await addCart(props.product.productId, 1, store.state.accessToken)
-        if (response) {
-          alert('已加入購物車')
-        } else {
-          alert(error.message || '加入購物車失敗')
-        }
-      }catch (error) {
-        alert(error.message || '加入購物車失敗')
-      }finally {
-        addingToCart.value = false
-      }
-    }
-
-    const handleViewDetail = () => {
-      router.push({
-        name: 'ProductDetail',
-        params: { id: props.product.productId }
-      })
-    }
+const handleViewDetail = () => {
+  router.push({
+    name: 'ProductDetail',
+    params: { id: props.product.productId }
+  })
+}
 </script>
 
 <style scoped>
@@ -214,6 +209,14 @@ const router = useRouter()
 .product-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.clickable-content:hover {
+  opacity: 0.8;
 }
 
 .product-image-container {
