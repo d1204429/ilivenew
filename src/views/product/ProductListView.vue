@@ -250,9 +250,13 @@ const fetchData = async () => {
     //   }
     }
 
-    const handleViewDetail = (productId) => {
-      router.push(`/products/${productId}`)
-    }
+const handleViewDetail = (productId) => {
+  router.push({
+    path: `/products/${productId}`,
+    // 可以選擇通過 state 傳遞當前產品數據
+    state: { product: products.value.find(p => p.productId === productId) }
+  })
+}
 
     const goBack = () => {
       router.back()
