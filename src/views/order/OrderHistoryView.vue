@@ -49,10 +49,7 @@
           </div>
         </div>
         <div class="order-footer">
-          <BaseButton
-              @click="viewOrderDetail(order.id)"
-              variant="outline"
-          >
+          <BaseButton @click="viewOrderDetail(order.orderId)" variant="outline">
             查看詳情
           </BaseButton>
         </div>
@@ -186,6 +183,7 @@ const changePage = (page) => {
 
 // 查看訂單詳情
 const viewOrderDetail = (orderId) => {
+  // 修改: 使用 orderId 而不是 order.id
   router.push(`/order/${orderId}`)
 }
 

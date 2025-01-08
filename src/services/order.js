@@ -76,19 +76,19 @@ async function getOrder(bearToken){
     }
 }
 
-async function getOrderDetail(orderId ,bearToken){
-    const response = await api.get(`/orders/${orderId}`,
-        {
-            headers: {
-                Authorization: `Bearer ${bearToken}`,
-            },
-        })
-        .catch(function (error) {
-            console.log(error.toJSON());
-        });
-    const data = await response.data;
-    console.log(data.data)
-    return data.data;
+async function getOrderDetail(orderId, bearToken) {
+    try {
+        const response = await api.get(`/orders/${orderId}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${bearToken}`,
+                },
+            });
+        return response.data?.data;  // 直接返回 response.data.data
+    } catch (error) {
+        console.error('獲取訂單詳情失敗:', error);
+        throw error;
+    }
 }
 
 export {createOrder, orderCreditPayment, orderApplePayPayment, getOrder, getOrderDetail}
