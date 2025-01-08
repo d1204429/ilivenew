@@ -1,5 +1,11 @@
 <template>
   <div class="about-container">
+    <div class="back-link">
+      <a @click="handleBack">
+        <i class="fas fa-arrow-left"></i> 返回
+      </a>
+    </div>
+
     <h1 class="page-title">關於我們</h1>
 
     <section class="company-intro">
@@ -128,6 +134,39 @@ section {
     margin-bottom: 1rem;
   }
 }
+.back-link {
+  margin-bottom: 1rem;
+}
+
+.back-link a {
+  display: inline-flex;
+  align-items: center;
+  color: #666;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.back-link a:hover {
+  color: #4299e1;
+}
+
+.back-link i {
+  margin-right: 0.5rem;
+}
+
 </style>
 <script setup lang="ts">
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+const handleBack = () => {
+  if (window.history.length > 2) {
+    router.go(-1)
+  } else {
+    router.push('/')
+  }
+}
+
 </script>
