@@ -24,15 +24,15 @@
           <div class="product-list">
             <div v-for="item in order.orderItems" :key="item.orderItemId" class="product-item">
               <img
-                  :src="getImageUrl(item.product?.imageUrl)"
-                  :alt="item.product?.name"
+                  :src="getImageUrl(item.product?.imageUrl || item.product?.imgUrl || item.imgUrl)"
+                  :alt="item.product?.name || item.productName"
                   @error="handleImageError"
                   class="product-image"
               >
               <div class="product-info">
-                <h3>{{ item.product?.name }}</h3>
+                <h3>{{ item.productName }}</h3>
                 <p>數量: {{ item.quantity }}</p>
-                <p>單價: ${{ formatPrice(item.product?.promotionalPrice || item.product?.originalPrice) }}</p>
+                <p>單價: ${{ formatPrice(item.price) }}</p>
               </div>
             </div>
           </div>
@@ -107,8 +107,9 @@ const pageSize = 10
 
 // 圖片 URL 處理
 const getImageUrl = (imagePath) => {
-  if (!imagePath) return ''
-  return imagePath
+  if (!imagePath) return '/default-image.jpg'  // 提供預設圖片路徑
+  if (imagePath.startsWith('http')) return imagePath  // 處理完整 URL
+  return imagePath.startsWith('/static') ? imagePath : `/static/image/${imagePath}`  // 處理相對路徑
 }
 
 // 圖片載入失敗處理
@@ -125,15 +126,30 @@ const formatPrice = (price) => {
 // 初始化加載
 onMounted(async () => {
   await fetchOrders()
+  console.log('訂單數據:', orders.value)
+  if (orders.value.length > 0) {
+    console.log('第一個訂單的商品:', orders.value[0].orderItems)
+    if (orders.value[0].orderItems?.length > 0) {
+      console.log('第一個商品的圖片URL:', orders.value[0].orderItems[0].product?.imageUrl)
+    }
+  }
 })
 
 // 獲取訂單數據
 const fetchOrders = async () => {
   try {
     const response = await getOrder(store.state.accessToken)
-    orders.value = response
+    if (response && Array.isArray(response)) {
+      orders.value = response.map(order => ({
+        ...order,
+        orderItems: order.orderItems || []  // 確保 orderItems 存在
+      }))
+    } else {
+      orders.value = []
+    }
   } catch (error) {
     console.error('獲取訂單失敗:', error)
+    orders.value = []
   }
 }
 
@@ -243,5 +259,34 @@ const formatDate = (dateString) => {
   padding: 40px;
   background: #f5f5f5;
   border-radius: 8px;
+}
+.product-item {
+  display: flex;
+  gap: 15px;
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.product-image {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 4px;
+  background-color: #f5f5f5;
+}
+
+.product-info {
+  flex: 1;
+}
+
+.product-info h3 {
+  margin: 0 0 8px;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.product-info p {
+  margin: 4px 0;
+  color: #666;
 }
 </style>
