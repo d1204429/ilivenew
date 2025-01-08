@@ -150,7 +150,7 @@ const store = useStore()
     const transformProductData = (product) => {
       return {
         ...product,
-        imageUrl: product.imageUrl?.split('/').pop(),
+        imageUrl: product.imageUrl,  // 保持原始 URL 不變
         price: product.promotionalPrice || product.price,
         originalPrice: product.originalPrice,
         stock: product.availableStock
