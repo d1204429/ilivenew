@@ -248,36 +248,40 @@ const router = useRouter()
     }
 
     // Form Submission
-    const handleSubmit = async () => {
-      try {
-        if (!validateForm() || isLocked.value) return
+const handleSubmit = async () => {
+  try {
+    if (!validateForm() || isLocked.value) return
 
-        clearAllTimers()
-        isLoading.value = true
-        globalError.value = ''
-        successMessage.value = ''
+    clearAllTimers()
+    isLoading.value = true
+    globalError.value = ''
+    successMessage.value = ''
 
-        const response = await login(formData.username.trim(),formData.password)
-        await store.dispatch('loginUser', response)
-        //console.log(store.state.accessToken)
+    const response = await login(formData.username.trim(),formData.password)
+    await store.dispatch('loginUser', response)
 
-        // Handle Remember Me
-        if (formData.rememberMe) {
-          localStorage.setItem('rememberedUsername', formData.username)
-        } else {
-          localStorage.removeItem('rememberedUsername')
-        }
+    // 添加這段代碼將登入狀態存儲到 localStorage
+    localStorage.setItem('accessToken', response.accessToken)
+    localStorage.setItem('refreshToken', response.refreshToken)
+    localStorage.setItem('userId', response.user.userId)
+    localStorage.setItem('userName', response.user.username)
 
-        //console.log('Login successful:', response)
-        loginAttempts.value = 0
-        startSuccessCountdown()
-      } catch (error) {
-        console.error('Login error:', error)
-        handleLoginError(error)
-      } finally {
-        isLoading.value = false
-      }
+    // Handle Remember Me
+    if (formData.rememberMe) {
+      localStorage.setItem('rememberedUsername', formData.username)
+    } else {
+      localStorage.removeItem('rememberedUsername')
     }
+
+    loginAttempts.value = 0
+    startSuccessCountdown()
+  } catch (error) {
+    console.error('Login error:', error)
+    handleLoginError(error)
+  } finally {
+    isLoading.value = false
+  }
+}
     // UI Helpers
     const togglePasswordVisibility = () => {
       showPassword.value = !showPassword.value

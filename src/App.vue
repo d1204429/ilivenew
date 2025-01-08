@@ -20,6 +20,8 @@ import { ref, onMounted, onUnmounted } from 'vue'
 // import { useRouter } from 'vue-router'
 import TheHeader from '@/components/layout/TheHeader.vue'
 import TheFooter from '@/components/layout/TheFooter.vue'
+import { useStore } from 'vuex'
+const store = useStore()
 
 //const router = useRouter()
     const isMobile = ref(false)
@@ -39,6 +41,17 @@ import TheFooter from '@/components/layout/TheFooter.vue'
       handleResize()
       window.addEventListener('resize', handleResize)
       //router.afterEach(handleRouteChange)
+      const accessToken = localStorage.getItem('accessToken')
+      const refreshToken = localStorage.getItem('refreshToken')
+      const userId = localStorage.getItem('userId')
+      const userName = localStorage.getItem('userName')
+
+      if (accessToken && userId) {
+        store.commit('updateAccessToken', accessToken)
+        store.commit('updateRefreshToken', refreshToken)
+        store.commit('updateUserId', userId)
+        store.commit('updateUserName', userName)
+      }
     })
 
     onUnmounted(() => {
