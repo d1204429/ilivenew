@@ -1,12 +1,12 @@
 import {api} from '@/utils/axios'
 
  async function getPromotionProduct() {
-    const response = await api.get('/admin/product-promotions/products')
+    const response = await api.get('/products/recommends')
     .catch(function (error) {
         console.log(error.toJSON());
     });
     const data = await response.data;
-    //console.log(data)
+    console.log(data)
   return data;
 }
 
@@ -20,4 +20,15 @@ async function getProductInfo(id){
   return data;
 }
 
-export {getPromotionProduct, getProductInfo}
+async function searchProduct(keyword){
+  //console.log(keyword)
+    const response = await api.get(`/products/search?keyword=${keyword}`)
+    .catch(function (error) {
+        console.log(error.toJSON());
+    });
+    const data = await response.data;
+    //console.log(data)
+  return data;
+}
+
+export {getPromotionProduct, getProductInfo, searchProduct}

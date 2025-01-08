@@ -14,7 +14,7 @@
 
     <!-- 訂單列表 -->
     <div class="order-list" v-if="orders.length">
-      <div class="order-item" v-for="order in orders" :key="order.id">
+      <div class="order-item" v-for="(order, index) in orders" :key="order.id">
         <div class="order-header">
           <span class="order-number">訂單編號: {{ order.orderId }}</span>
           <span class="order-date">下單時間: {{ formatDate(order.createdAt) }}</span>
@@ -22,12 +22,12 @@
         </div>
         <div class="order-content">
           <div class="product-list">
-            <div v-for="item in order.items" :key="item.id" class="product-item">
-              <img :src="item.productImage" :alt="item.productName">
+            <div v-for="(item, subdex) in orderItems[index]" :key="item.productId" class="product-item">
+              <img :src="getImageUrl(item.imageUrl)" :alt="item.name">
               <div class="product-info">
-                <h3>{{ item.productName }}</h3>
-                <p>數量: {{ item.quantity }}</p>
-                <p>單價: ${{ item.price }}</p>
+                <h3>{{ item.name }}</h3>
+                <p>數量: {{ orders[index].items[subdex].quantity }}</p>
+                <p>單價: ${{ orders[index].items[subdex].price }}</p>
               </div>
             </div>
           </div>
@@ -37,7 +37,7 @@
         </div>
         <div class="order-footer">
           <BaseButton
-              @click="viewOrderDetail(order.id)"
+              @click="viewOrderDetail(order.orderId)"
               variant="outline"
           >
             查看詳情
@@ -77,12 +77,14 @@ import { useRouter } from 'vue-router'
 import BaseButton from '@/components/common/BaseButton.vue'
 import BaseInput from '@/components/common/BaseInput.vue'
 import {getOrder} from '@/services/order';
+import { getProductInfo } from '@/services/products';
 
 const store = useStore()
 const router = useRouter()
 
 // 資料狀態
 const orders = ref([])
+const orderItems = ref([])
 const searchKeyword = ref('')
 const currentPage = ref(1)
 const totalPages = ref(1)
@@ -91,6 +93,7 @@ const pageSize = 10
 // 初始化加載
 onMounted(async () => {
   await fetchOrders()
+  await fetchOrderItems()
 })
 
 // 獲取訂單數據
@@ -101,6 +104,41 @@ const fetchOrders = async () => {
   } catch (error) {
     console.error('獲取訂單失敗:', error)
   }
+}
+
+const fetchOrderItems = async()=>{
+  try {
+    for (let i = 0; i < orders.value.length; i++) {
+      let items = orders.value[i].items
+      orderItems.value[i] =await fetchProdItems(items)
+    }
+    //console.log(orderItems.value)
+  } catch (error) {
+    console.error('獲取訂單失敗:', error)
+  }
+}
+
+//
+const fetchProdItems = async (items) => {
+  try {
+    //loading.value = true
+    //console.log(items)
+    if(items && items.length > 0){
+      const promises = items.map(item => getProductInfo(item.productId))
+      return await Promise.all(promises)
+    }
+  } catch (error) {
+    console.error('獲取購物車失敗:', error)
+    return []
+  } 
+}
+
+// 圖片處理方法
+const getImageUrl = (imagePath) => {
+  if (!imagePath) {
+    return 
+  }
+  return imagePath.replace('/image/', '/static/image/')
 }
 
 // 搜尋處理

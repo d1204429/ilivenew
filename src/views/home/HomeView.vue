@@ -17,7 +17,26 @@
       </button>
     </div>
 
-    <!-- 促銷活動區域 -->
+    <!-- 搜尋結果區域 -->
+    <section v-if="isTypeSearch" >
+      <h2>搜尋結果</h2>
+      <div v-if="isSearching" class="loading">
+        搜尋中...
+      </div>
+      <div v-else-if="searchResults.length === 0" class="no-results">
+        沒有找到相關商品
+      </div>
+      <div v-else class="products-grid">
+        <div v-for="product in searchResults" 
+             :key="product.productId" 
+             class="product-card">
+          <ProductCard :product="product" />
+        </div>
+      </div>
+    </section>
+
+    <template v-else>
+      <!-- 促銷活動區域 -->
     <section class="promotions-section">
       <h2>當前促銷活動</h2>
       <div class="promotions-grid">
@@ -42,7 +61,7 @@
     </section>
 
     <!-- 熱門商品區域 -->
-    <section class="hot-products-section">
+    <!-- <section class="hot-products-section">
       <h2>熱門商品優惠</h2>
       <div class="products-grid">
         <div v-for="product in productPromotions"
@@ -51,27 +70,33 @@
           <ProductCard
               :product="product"
               
-          />
+          /> -->
           <!-- :promotional-price="product.promotionalPrice" -->
-          <div class="promotion-tag">
+          <!-- <div class="promotion-tag">
             特惠價格
           </div>
         </div>
       </div>
-    </section>
+    </section> -->
+    <PromotionProductCarousel :product-promotions="productPromotions"/>
+    </template>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { getPromotions } from '@/services/promotion'
-import { getPromotionProduct } from '@/services/products'
+import { getPromotionProduct, getProductInfo } from '@/services/products'
 // import { useRouter } from 'vue-router'
-// import { useStore } from 'vuex'
+import { useStore } from 'vuex'
 import ProductCard from '@/components/product/ProductCard.vue'
+import PromotionProductCarousel from '@/components/carousel/PromotionProductCarousel.vue'
 
 //const router = useRouter()
-//const store = useStore()
+const store = useStore()
+const isSearching = computed(() => store.state.isSearching)
+const searchResults = computed(() => store.state.searchResults)
+const isTypeSearch = computed(()=> store.state.isTypeSearch)
 
 //初始get promotionData
 onMounted(() => {
@@ -107,13 +132,24 @@ const nextSlide = () => {
 const activePromotions = ref([])
 // 商品
 const productPromotions = ref([])
+const promotion = ref([])
 // 獲取促銷活動和商品資料
 const getPromotionsData = async () => {
   try {
     activePromotions.value = await getPromotions()
-    productPromotions.value = await getPromotionProduct()
+    promotion.value = await getPromotionProduct() 
+    await getpromtProdInfo()
+    //productPromotions.value = await getPromotionProduct()
   } catch (error) {
     console.error('獲取促銷資料失敗:', error)
+  }
+}
+
+const getpromtProdInfo= async() =>{
+  if(promotion.value){
+    const promises = promotion.value.map(item => getProductInfo(item.productId))
+    const results = await Promise.all(promises)
+    productPromotions.value = results
   }
 }
 
@@ -126,22 +162,7 @@ return new Date(dateString).toLocaleDateString('zh-TW')
 const formatDiscount = (type, value) => {
   return type === 'PERCENTAGE' ? `${value}% OFF` : `$${value} 折扣`
 }
-
-    // 加入購物車
-    const addToCart = async (product) => {
-      // try {
-      //   await store.dispatch('cart/addToCart', {
-      //     productId: product.productId,
-      //     quantity: 1
-      //   })
-      //   store.dispatch('app/setSuccess', '成功加入購物車')
-      // } catch (error) {
-      //   store.dispatch('app/setError', '加入購物車失敗')
-      // }
-    }
-
 </script>
-
 
 <style scoped>
 .home-view {

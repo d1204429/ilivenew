@@ -1,4 +1,5 @@
 import {createStore} from 'vuex'
+import {searchProduct} from '@/services/products'
 
 const storeOptions = {
     //狀態資料
@@ -7,6 +8,9 @@ const storeOptions = {
         refreshToken : "",
         userId : "",
         userName : "",
+        searchResults: [],
+        isSearching: false,
+        isTypeSearch:false
     },
     //更新器
     mutations:{
@@ -22,6 +26,15 @@ const storeOptions = {
         updateUserName(state, payload){
             state.userName = payload
         },
+        setSearchResult(state, results) {
+            state.searchResults = results
+        },
+        setIsSearching(state, status) {
+            state.isSearching = status
+        },
+        setIsTypeSearch(state, payload){
+            state.isTypeSearch = payload
+        }
     },
     //異步處理動作
     actions:{
@@ -40,6 +53,18 @@ const storeOptions = {
                 throw error
             }
         },
+        async searchProducts({ commit }, keyword) {
+            try {
+                commit('setIsSearching', true)
+                const results = await searchProduct(keyword)
+                commit('setSearchResult', results)
+            } catch (error) {
+                console.error('搜尋商品失敗:', error)
+                commit('setSearchResult', [])
+            } finally {
+                commit('setIsSearching', false)
+            }
+        }
     },
 }
 

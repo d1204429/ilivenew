@@ -72,12 +72,11 @@
             type="search"
             v-model="searchKeyword"
             placeholder="搜尋商品"
-            
             aria-label="搜尋"
         >
         <!-- @keyup.enter="handleSearch" -->
         <button
-            
+            @click="handleSearch"
             aria-label="搜尋按鈕"
         >
         <!-- @click="handleSearch" -->
@@ -128,26 +127,63 @@ import { useStore } from 'vuex'
 // import { useRouter } from 'vue-router'
 
 const store = useStore()
-    // const router = useRouter()
+// const router = useRouter()
 
-    // Reactive State
-    const isMenuOpen = ref(false)
-    const isCategoryOpen = ref(false)
-    const searchKeyword = ref('')
-    const categories = ref([
-      { id: 11, name: '冰箱' },
-      { id: 12, name: '電視' },
-      { id: 13, name: '洗衣機' }
-    ])
-    const isInitialized = ref(false)
+// Reactive State
+const isMenuOpen = ref(false)
+const isCategoryOpen = ref(false)
+const searchKeyword = ref('')
+const categories = ref([
+  { id: 11, name: '冰箱' },
+  { id: 12, name: '電視' },
+  { id: 13, name: '洗衣機' }
+])
+const isInitialized = ref(false)
 
 // Computed Properties
 const isLoggedIn = computed(() => !!store.state.accessToken)
 const currentUserName = computed(() => store.state.userName) 
-    
-    //const currentUser = computed(() => store.state.userId)
-    //console.log(currentUser)
-    // const cartItemCount = computed(() => store.getters['cart/itemCount'])
+
+watch(searchKeyword, async (newValue) => 
+{
+  const trimmedKeyword = newValue.trim()
+  if(trimmedKeyword){
+    store.commit('setIsTypeSearch', true)
+  }else{
+    store.commit('setIsTypeSearch', false)
+    store.commit('setSearchResult', [])
+  }
+})
+
+const handleSearch = async () => {
+  const trimmedKeyword = searchKeyword.value.trim()
+  if (trimmedKeyword) {
+    await store.dispatch('searchProducts', trimmedKeyword)
+  }
+}
+
+const toggleMenu = () => {
+  isMenuOpen.value = !isMenuOpen.value
+  if (!isMenuOpen.value) {
+    isCategoryOpen.value = false
+  }
+  document.body.style.overflow = isMenuOpen.value ? 'hidden' : ''
+}
+
+const toggleCategory = () => {
+  isCategoryOpen.value = !isCategoryOpen.value
+}
+
+const handleResize = () => {
+  if (window.innerWidth > 768 && isMenuOpen.value) {
+    isMenuOpen.value = false
+    document.body.style.overflow = ''
+  }
+}
+
+//const currentUser = computed(() => store.state.userId)
+//console.log(currentUser)
+// const cartItemCount = computed(() => store.getters['cart/itemCount'])
 
 // Lifecycle Hooks
 onMounted(async () => {
@@ -226,38 +262,7 @@ onUnmounted(() => {
     //   }
     // }
 
-    // const handleSearch = () => {
-    //   const trimmedKeyword = searchKeyword.value.trim()
-    //   if (trimmedKeyword) {
-    //     router.push({
-    //       path: '/products',
-    //       query: { search: trimmedKeyword, page: 1 }
-    //     })
-    //     searchKeyword.value = ''
-    //     if (isMenuOpen.value) {
-    //       toggleMenu()
-    //     }
-    //   }
-    // }
-
-    const toggleMenu = () => {
-      isMenuOpen.value = !isMenuOpen.value
-      if (!isMenuOpen.value) {
-        isCategoryOpen.value = false
-      }
-      document.body.style.overflow = isMenuOpen.value ? 'hidden' : ''
-    }
-
-    const toggleCategory = () => {
-      isCategoryOpen.value = !isCategoryOpen.value
-    }
-
-    const handleResize = () => {
-      if (window.innerWidth > 768 && isMenuOpen.value) {
-        isMenuOpen.value = false
-        document.body.style.overflow = ''
-      }
-    }
+    
 
     // Watchers
     // watch(isLoggedIn, async (newValue, oldValue) => {

@@ -57,7 +57,7 @@ async function orderApplePayPayment(orderId, applePayToken, bearToken){
 }
 
 async function getOrder(bearToken){
-    const response = await api.get('/orders',
+    const response = await api.get('/orders/all',
         {
             headers: {
                 Authorization: `Bearer ${bearToken}`,
@@ -67,8 +67,8 @@ async function getOrder(bearToken){
         console.log(error.toJSON());
     });
     const data = await response.data;
-    console.log(data.data.orders)
-  return data.data.orders;
+    //console.log(data.orders)
+  return data.orders;
 }
 
 async function getOrderDetail(orderId ,bearToken){

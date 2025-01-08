@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="row">
+    <div class="row" v-if="isDataReady">
       <div class="col-12">
         <h2 class="mb-4">訂單詳細資訊</h2>
 
@@ -9,14 +9,14 @@
           <div class="card-body">
             <div class="row">
               <div class="col-md-6">
-                <p><strong>訂單編號:</strong> {{ order.id }}</p>
+                <p><strong>訂單編號:</strong> {{ order.orderId }}</p>
                 <p><strong>訂購日期:</strong> {{ order.orderDate }}</p>
-                <p><strong>訂單狀態:</strong> {{ order.status }}</p>
+                <p><strong>訂單狀態:</strong> {{ order.statusId }}</p>
               </div>
               <div class="col-md-6">
-                <p><strong>收件人:</strong> {{ order.recipient }}</p>
-                <p><strong>聯絡電話:</strong> {{ order.phone }}</p>
-                <p><strong>配送地址:</strong> {{ order.address }}</p>
+                <p><strong>收件人:</strong> {{ userData.fullName }}</p>
+                <p><strong>聯絡電話:</strong> {{ userData.phoneNumber }}</p>
+                <p><strong>配送地址:</strong> {{ order.shippingAddress }}</p>
               </div>
             </div>
           </div>
@@ -60,36 +60,55 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted,computed } from 'vue'
 import { useStore } from 'vuex'
 import { useRoute } from 'vue-router'
 import {getOrderDetail} from '@/services/order';
+import { getUser } from '@/services/users'
 
 const store = useStore()
 const route = useRoute()
-const order = ref({
-    id: '',
-    orderDate: '',
-    status: '',
-    recipient: '',
-    phone: '',
-    address: '',
-    items: [],
-    totalAmount: 0
+const userData = ref()
+const order = ref()
+
+// 檢查數據是否都準備好
+const isDataReady = computed(() => {
+  return order.value && userData.value
 })
 
 const fetchOrderDetail = async () => {
     try {
-        const orderId = route.params.id
-        const response = await getOrderDetail(orderId, store.state.accessToken)
-        order.value = response.data
+        const id = route.params.id
+        const response = await getOrderDetail(id, store.state.accessToken)
+        order.value = response
     } catch (error) {
         console.error('獲取訂單詳細資訊失敗:', error)
     }
 }
 
+//使用者資料擷取
+const fetchUserData = async () => {
+  try {
+    const data = await getUser(store.state.userId, store.state.accessToken)
+    userData.value = data
+  } catch (error) {
+    console.error('獲取使用者資料失敗:', error)
+  } finally {
+  }
+}
+
+const initData = async () => {
+  try {
+    await fetchOrderDetail()
+    await fetchUserData()
+  } catch (error) {
+    console.error('初始化資料失敗:', error)
+  } finally {
+  }
+}
+
 onMounted(() => {
-    fetchOrderDetail()
+    initData()
 })
 </script>
 
