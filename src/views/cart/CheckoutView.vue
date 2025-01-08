@@ -38,7 +38,7 @@
         </div>
       </div>
     </div>
-    
+
     <!-- 訂單摘要 -->
     <div class="order-summary" v-if="isDataReady">
       <h2>訂單摘要</h2>
@@ -119,9 +119,12 @@
       <button
           class="btn-next"
           @click="nextStep"
-          :disabled="!canProceed"
+          :disabled="!canProceed || isProcessing"
       >
-        {{ currentStep === 1 ? '轉訂單' : '結帳' }}
+        {{ currentStep === 1 ?
+          (isProcessing ? '處理中...' : '轉訂單') :
+          (isProcessing ? '付款中...' : '結帳')
+        }}
       </button>
     </div>
   </div>
@@ -217,17 +220,39 @@ const canProceed = computed(() => {
 
 // 方法
 const nextStep = async () => {
-    if (currentStep.value ==1) {
-        await processPayment()
+  try {
+    if (currentStep.value === 1) {
+      // 創建訂單
+      const orderResponse = await createOrder(buyerInfo.value.address, store.state.accessToken)
+      if (orderResponse?.data?.orderId) {
+        orderId.value = orderResponse.data.orderId
         currentStep.value++
+      } else {
+        throw new Error('訂單創建失敗')
+      }
     } else {
-        if(selectedPayment.value === "credit"){
-           await creditPayment()
-        }else{
-
-        }
-        router.push('/orders')
+      // 處理付款
+      if (selectedPayment.value === "credit") {
+        await creditPayment()
+        // 付款成功後跳轉
+        await router.push({
+          name: 'OrderHistory', // 確保這是您的路由名稱
+          // 或者使用路徑
+          // path: '/orders/history'
+        })
+      } else if (selectedPayment.value === "apple") {
+        // 處理 Apple Pay
+        await router.push({
+          name: 'OrderHistory'
+        })
+      }
     }
+  } catch (error) {
+    console.error('處理訂單/付款失敗:', error)
+    alert(error.message || '處理失敗，請稍後再試')
+  }finally {
+    isProcessing.value = false
+  }
 }
 
 // const previousStep = () => {
@@ -249,34 +274,51 @@ const formatPrice = (price) => {
 }
 
 const processPayment = async () => {
-    try {
+  try {
     loading.value = true
-    //console.log(store.state.accessToken)
-    const data = await createOrder(buyerInfo.value.address , store.state.accessToken)
-    orderId.value = data.data.orderId
-    console.log(orderId.value)
+    const response = await createOrder(buyerInfo.value.address, store.state.accessToken)
+    if (response && response.data && response.data.orderId) {
+      orderId.value = response.data.orderId
+      return true
+    } else {
+      throw new Error('創建訂單失敗')
+    }
   } catch (error) {
     console.error('轉訂單失敗:', error)
+    throw error
   } finally {
     loading.value = false
   }
 }
 
 const creditPayment = async () => {
-    try {
-    loading.value = true
-    //console.log(store.state.accessToken)
-    const data = await orderCreditPayment(orderId.value, cardInfo.value.number , store.state.accessToken)
+  try {
+    if (!orderId.value) {
+      throw new Error('訂單編號無效')
+    }
+    const response = await orderCreditPayment(
+        orderId.value,
+        cardInfo.value.number,
+        store.state.accessToken
+    )
+
+    // 檢查 response 狀態
+    if (response && response.status === 200) {
+      return true
+    } else {
+      throw new Error(response?.data?.message || '付款處理失敗')
+    }
   } catch (error) {
+    // 如果是 axios 錯誤，提取具體的錯誤信息
+    const errorMessage = error.response?.data?.message || error.message || '付款失敗，請稍後再試'
     console.error('信用卡付款失敗:', error)
-  } finally {
-    loading.value = false
+    throw new Error(errorMessage)
   }
 }
-
+const isProcessing = ref(false)
 // 檢查數據是否都準備好
 const isDataReady = computed(() => {
-  return cartItems.value?.length > 0 && 
+  return cartItems.value?.length > 0 &&
          prodItems.value?.length > 0 &&
          cartItems.value.length === prodItems.value.length
 })
@@ -291,7 +333,7 @@ const getPrice = (promt, origin) => {
 // 圖片處理方法
 const getImageUrl = (imagePath) => {
   if (!imagePath) {
-    return 
+    return
   }
   return imagePath.replace('/image/', '/static/image/')
 }
@@ -316,7 +358,7 @@ const fetchCartItems = async () => {
     //console.log(store.state.accessToken)
     const data = await getCartItems(store.state.accessToken)
     cartItems.value = data
-    
+
   } catch (error) {
     console.error('獲取購物車失敗:', error)
   } finally {
@@ -327,13 +369,15 @@ const fetchCartItems = async () => {
 const fetchProdItems = async () => {
   try {
     if(cartItems.value && cartItems.value.length > 0){
-      const promises = cartItems.value.map(item => getProductInfo(item.productId))
-      const results = await Promise.all(promises)
-      prodItems.value = results
+      // 獲取所有商品信息
+      const response = await getProductInfo()
+      // 過濾出購物車中的商品
+      prodItems.value = response.filter(product =>
+          cartItems.value.some(cartItem => cartItem.productId === product.productId)
+      )
     }
   } catch (error) {
-    console.error('獲取購物車失敗:', error)
-  } finally {
+    console.error('獲取商品資訊失敗:', error)
   }
 }
 
