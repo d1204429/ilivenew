@@ -1,77 +1,86 @@
 <template>
   <div class="contact-container">
-    <div class="back-link">
-      <a @click="handleBack">
-        <i class="fas fa-arrow-left"></i> 返回
-      </a>
-    </div>
-
     <h1 class="page-title">聯絡我們</h1>
 
     <div class="contact-content">
-      <div class="contact-card">
-        <div class="card-item">
-          <div class="icon-wrapper">
-            <i class="fas fa-phone-alt"></i>
-          </div>
-          <div class="info">
-            <h3>電話諮詢</h3>
-            <p>0800-888-888</p>
-            <small>週一至週五 9:00-18:00</small>
-          </div>
+      <div class="contact-info">
+        <h2>聯絡資訊</h2>
+        <div class="info-item">
+          <i class="fas fa-phone"></i>
+          <p>客服專線：0800-888-888</p>
         </div>
-
-        <div class="card-item">
-          <div class="icon-wrapper">
-            <i class="fas fa-envelope"></i>
-          </div>
-          <div class="info">
-            <h3>電子郵件</h3>
-            <p>service@ilive.com</p>
-            <small>我們將在24小時內回覆</small>
-          </div>
+        <div class="info-item">
+          <i class="fas fa-envelope"></i>
+          <p>客服信箱：service@ilive.com</p>
         </div>
-
-        <div class="card-item">
-          <div class="icon-wrapper">
-            <i class="fas fa-map-marker-alt"></i>
-          </div>
-          <div class="info">
-            <h3>營業據點</h3>
-            <p>台北市信義區信義路五段7號</p>
-            <small>歡迎預約參觀</small>
-          </div>
-        </div>
-
-        <div class="card-item">
-          <div class="icon-wrapper">
-            <i class="fas fa-comments"></i>
-          </div>
-          <div class="info">
-            <h3>線上客服</h3>
-            <p>即時對話服務</p>
-            <small>點擊開始對話</small>
-          </div>
+        <div class="info-item">
+          <i class="fas fa-clock"></i>
+          <p>服務時間：週一至週五 9:00-18:00</p>
         </div>
       </div>
+
+      <form class="contact-form" @submit.prevent="submitForm">
+        <h2>意見回饋</h2>
+        <div class="form-group">
+          <label for="name">姓名</label>
+          <input
+              type="text"
+              id="name"
+              v-model="formData.name"
+              required
+          >
+        </div>
+        <div class="form-group">
+          <label for="email">電子郵件</label>
+          <input
+              type="email"
+              id="email"
+              v-model="formData.email"
+              required
+          >
+        </div>
+        <div class="form-group">
+          <label for="subject">主旨</label>
+          <input
+              type="text"
+              id="subject"
+              v-model="formData.subject"
+              required
+          >
+        </div>
+        <div class="form-group">
+          <label for="message">訊息內容</label>
+          <textarea
+              id="message"
+              v-model="formData.message"
+              rows="5"
+              required
+          ></textarea>
+        </div>
+        <button type="submit" class="submit-btn">送出訊息</button>
+      </form>
     </div>
   </div>
 </template>
 
-<script setup lang="ts">
-import { useRouter } from 'vue-router'
-
-const router = useRouter()
-
-const handleBack = () => {
-  try {
-    if (window.history.state?.back) {
-      router.go(-1)
-    } else {
-      router.push('/')
+<script>
+export default {
+  name: 'ContactView',
+  data() {
+    return {
+      formData: {
+        name: '',
+        email: '',
+        subject: '',
+        message: ''
+      }
     }
-  } catch (error) {
-    router.push('/')
+  },
+  methods: {
+    submitForm() {
+      // TODO: 實作表單提交邏輯
+      console.log('Form submitted:', this.formData);
+    }
   }
 }
 </script>
@@ -80,103 +89,87 @@ const handleBack = () => {
 .contact-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 3rem 1rem;
+  padding: 2rem;
 }
 
 .page-title {
   text-align: center;
-  margin-bottom: 4rem;
-  color: #2c3e50;
-  font-size: 2.5rem;
+  margin-bottom: 3rem;
+  color: #333;
 }
 
 .contact-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  display: grid;
+  grid-template-columns: 1fr 2fr;
   gap: 3rem;
 }
 
-.contact-card {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 2rem;
-  width: 100%;
-  max-width: 900px;
-}
-
-.card-item {
-  background: #ffffff;
-  padding: 2rem;
-  border-radius: 15px;
-  box-shadow: 0 10px 20px rgba(0,0,0,0.05);
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  transition: transform 0.3s ease;
-}
-
-.card-item:hover {
-  transform: translateY(-5px);
-}
-
-.icon-wrapper {
-  width: 60px;
-  height: 60px;
+.contact-info {
   background: #f8f9fa;
-  border-radius: 50%;
+  padding: 2rem;
+  border-radius: 8px;
+}
+
+.info-item {
   display: flex;
   align-items: center;
-  justify-content: center;
+  margin: 1.5rem 0;
+  gap: 1rem;
 }
 
-.icon-wrapper i {
+.info-item i {
   font-size: 1.5rem;
-  color: #3498db;
+  color: #007bff;
 }
 
-.info h3 {
-  color: #2c3e50;
+.contact-form {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+label {
+  display: block;
   margin-bottom: 0.5rem;
+  color: #333;
 }
 
-.info p {
-  color: #34495e;
-  margin-bottom: 0.3rem;
+input,
+textarea {
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
 }
 
-.info small {
-  color: #7f8c8d;
+textarea {
+  resize: vertical;
 }
 
-.back-link {
-  margin-bottom: 1rem;
-}
-
-.back-link a {
-  display: inline-flex;
-  align-items: center;
-  color: #666;
+.submit-btn {
+  background: #007bff;
+  color: white;
+  padding: 0.8rem 2rem;
+  border: none;
+  border-radius: 4px;
   cursor: pointer;
-  text-decoration: none;
-  transition: color 0.3s ease;
+  font-size: 1rem;
+  transition: background-color 0.3s;
 }
 
-.back-link a:hover {
-  color: #4299e1;
-}
-
-.back-link i {
-  margin-right: 0.5rem;
+.submit-btn:hover {
+  background: #0056b3;
 }
 
 @media (max-width: 768px) {
-  .contact-card {
+  .contact-content {
     grid-template-columns: 1fr;
-  }
-
-  .card-item {
-    padding: 1.5rem;
   }
 }
 </style>

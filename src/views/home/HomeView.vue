@@ -42,33 +42,55 @@
     </section>
 
     <!-- 熱門商品區域 -->
+    <!-- <section class="hot-products-section">
+      <h2>熱門商品優惠</h2>
+      <vue-slick-carousel
+        :settings="carouselSettings"
+        class="products-carousel"
+      >
+        <div v-for="product in productPromotions" :key="product.productId" class="product-promotion-card">
+          <ProductCard :product="product" />
+          <div class="promotion-tag">特惠價格</div>
+        </div>
+      </vue-slick-carousel>
+    </section>  -->
     <section class="hot-products-section">
       <h2>熱門商品優惠</h2>
-      <div class="products-grid">
-        <div v-for="product in productPromotions"
-             :key="product.productId"
-             class="product-promotion-card">
-          <ProductCard
-              :product="product"
-              
-          />
-          <!-- :promotional-price="product.promotionalPrice" -->
-          <div class="promotion-tag">
-            特惠價格
-          </div>
-        </div>
-      </div>
-    </section>
+        <swiper
+            :slides-per-view="4"
+            :space-between="20"
+            navigation
+            pagination
+            autoplay
+            loop
+          class="products-carousel"
+        >
+          <swiper-slide
+            v-for="product in productPromotions"
+            :key="product.productId"
+            class="product-promotion-card"
+          >
+            <ProductCard :product="product" />
+            <div class="promotion-tag">特惠價格</div>
+          </swiper-slide>
+        </swiper>
+      </section>
   </div>
 </template>
 
 <script setup>
+// Import Swiper Vue.js components
+import { Swiper, SwiperSlide } from 'swiper/vue';
+// Import Swiper styles
+import 'swiper/css';
 import { ref, onMounted } from 'vue'
 import { getPromotions } from '@/services/promotion'
-import { getPromotionProduct } from '@/services/products'
+import { getPromotionProduct, getProductsByCategory } from '@/services/products'
 // import { useRouter } from 'vue-router'
 // import { useStore } from 'vuex'
 import ProductCard from '@/components/product/ProductCard.vue'
+// import { Swiper, SwiperSlide } from 'swiper/vue';
+// import 'swiper/swiper-bundle.css';
 
 //const router = useRouter()
 //const store = useStore()
@@ -77,6 +99,13 @@ import ProductCard from '@/components/product/ProductCard.vue'
 onMounted(() => {
   getPromotionsData()
 })
+const carouselSettings = ref({
+  slidesToShow: 3,
+  slidesToScroll: 1,
+  infinite: true,
+  dots: true,
+  arrows: true, // 確保使用內建箭頭
+});
 
 // 輪播圖相關
 const currentSlide = ref(0)
@@ -111,7 +140,7 @@ const productPromotions = ref([])
 const getPromotionsData = async () => {
   try {
     activePromotions.value = await getPromotions()
-    productPromotions.value = await getPromotionProduct()
+    productPromotions.value = await getPromotionProduct('冰箱')
   } catch (error) {
     console.error('獲取促銷資料失敗:', error)
   }
@@ -336,5 +365,18 @@ const formatDiscount = (type, value) => {
   .promotion-card {
     margin: 0 0.5rem;
   }
+}
+
+
+.hot-products-section {
+  padding: 20px;
+}
+.product-promotion-card {
+  padding: 10px;
+  text-align: center;
+}
+.promotion-tag {
+  color: red;
+  font-weight: bold;
 }
 </style>

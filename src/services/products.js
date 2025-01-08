@@ -23,9 +23,9 @@ async function getProductInfo() {
         throw error;
     }
 }
-async function getProductsByCategory(categoryId) {
+async function getProductsByCategory(categoryName) {
     try {
-        const response = await api.get(`/products?categoryId=${categoryId}`);
+        const response = await api.get(`/products/category/name/${categoryName}`);
         console.log('API Response:', response); // 添加日誌
         return response.data;
     } catch (error) {

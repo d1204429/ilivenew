@@ -20,8 +20,8 @@ import { ref, onMounted, onUnmounted } from 'vue'
 // import { useRouter } from 'vue-router'
 import TheHeader from '@/components/layout/TheHeader.vue'
 import TheFooter from '@/components/layout/TheFooter.vue'
+
 import { useStore } from 'vuex'
-import {api} from "@/utils/axios.js";
 const store = useStore()
 
 //const router = useRouter()
@@ -38,30 +38,22 @@ const store = useStore()
       })
     }
 
-onMounted(() => {
-  // 處理響應式設計
-  handleResize()
-  window.addEventListener('resize', handleResize)
+    onMounted(() => {
+      handleResize()
+      window.addEventListener('resize', handleResize)
+      //router.afterEach(handleRouteChange)
+      const accessToken = localStorage.getItem('accessToken')
+      const refreshToken = localStorage.getItem('refreshToken')
+      const userId = localStorage.getItem('userId')
+      const userName = localStorage.getItem('userName')
 
-  // 初始化身份驗證
-  store.dispatch('initializeAuth')
-
-  // 檢查並恢復登入狀態
-  const accessToken = localStorage.getItem('accessToken')
-  const refreshToken = localStorage.getItem('refreshToken')
-  const userId = localStorage.getItem('userId')
-  const userName = localStorage.getItem('userName')
-
-  if (accessToken && userId) {
-    store.commit('updateAccessToken', accessToken)
-    store.commit('updateRefreshToken', refreshToken)
-    store.commit('updateUserId', userId)
-    store.commit('updateUserName', userName)
-
-    // 設置 axios 默認 headers
-    api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`
-  }
-})
+      if (accessToken && userId) {
+        store.commit('updateAccessToken', accessToken)
+        store.commit('updateRefreshToken', refreshToken)
+        store.commit('updateUserId', userId)
+        store.commit('updateUserName', userName)
+      }
+    })
 
     onUnmounted(() => {
       window.removeEventListener('resize', handleResize)

@@ -1,12 +1,6 @@
 <template>
   <div class="register-view">
     <div class="register-container">
-      <div class="back-link">
-        <a @click="handleBack">
-          <i class="fas fa-arrow-left"></i> 返回
-        </a>
-      </div>
-
       <h2 class="register-title">會員註冊</h2>
 
       <div v-if="globalError" class="error-message">
@@ -83,13 +77,6 @@ const router = useRouter()
       { id: 'password', label: '密碼', type: 'password', placeholder: '請輸入密碼' },
       { id: 'confirmPassword', label: '確認密碼', type: 'password', placeholder: '請再次輸入密碼' }
     ]
-const handleBack = () => {
-  if (window.history.length > 2) {
-    router.go(-1)
-  } else {
-    router.push('/')
-  }
-}
 
     const formData = reactive({
       username: '',
@@ -354,25 +341,4 @@ label {
     font-size: 1.5rem;
   }
 }
-.back-link {
-  margin-bottom: 1rem;
-}
-
-.back-link a {
-  display: inline-flex;
-  align-items: center;
-  color: #666;
-  cursor: pointer;
-  text-decoration: none;
-  transition: color 0.3s ease;
-}
-
-.back-link a:hover {
-  color: #4299e1;
-}
-
-.back-link i {
-  margin-right: 0.5rem;
-}
-
 </style>

@@ -1,7 +1,7 @@
 <template>
   <div class="product-card" :class="{ 'out-of-stock': !product.availableStock }">
-    <!-- 商品圖片區塊 -->
-    <div class="product-image-container">
+    <!-- 商品圖片區塊 - 可點擊 -->
+    <div class="product-image-container cursor-pointer" @click="handleViewDetail">
       <img
           :src="getProductImageUrl"
           :alt="product.name"
@@ -20,12 +20,8 @@
       <div v-if="imageLoading" class="image-skeleton"></div>
     </div>
 
-    <!-- 商品內容區塊 -->
-    <div class="product-content ">
-      <h3 class="product-title" :title="product.name">
-        {{ truncateText(product.name, 20) }}
-      </h3>
-
+    <div class="product-content">
+      <!-- 品牌資訊 - 不可點擊區域 -->
       <div class="product-meta">
         <span v-if="product.brand" class="brand">
           <i class="fas fa-tag"></i>
@@ -37,24 +33,33 @@
         </span>
       </div>
 
-      <div class="product-price" :class="{ 'has-discount': hasDiscount }">
-        <span class="current-price">
-          NT$ {{ formatPrice(product.promotionalPrice || product.price) }}
-        </span>
-        <span v-if="hasDiscount" class="original-price">
-          NT$ {{ formatPrice(product.originalPrice) }}
-        </span>
+      <!-- 可點擊內容區域 -->
+      <div class="clickable-content cursor-pointer" @click="handleViewDetail">
+        <h3 class="product-title" :title="product.name">
+          {{ truncateText(product.name, 20) }}
+        </h3>
+
+        <div class="product-price" :class="{ 'has-discount': hasDiscount }">
+          <span class="current-price">
+            NT$ {{ formatPrice(product.promotionalPrice || product.price) }}
+          </span>
+          <span v-if="hasDiscount" class="original-price">
+            NT$ {{ formatPrice(product.originalPrice) }}
+          </span>
+        </div>
+
+        <p v-if="product.description" class="product-description">
+          {{ truncateText(product.description, 50) }}
+        </p>
       </div>
 
-      <p v-if="product.description" class="product-description">
-        {{ truncateText(product.description, 50) }}
-      </p>
-
+      <!-- 庫存狀態 -->
       <div class="product-stock" :class="stockStatusClass">
         <i :class="stockStatusIcon"></i>
         {{ stockStatusText }}
       </div>
 
+      <!-- 加入購物車按鈕 -->
       <div class="product-actions">
         <BaseButton
             class="cart-btn"
@@ -64,15 +69,6 @@
         >
           <i class="fas fa-cart-plus"></i>
           {{ cartButtonText }}
-        </BaseButton>
-
-        <BaseButton
-            class="detail-btn"
-            variant="outline"
-            @click="handleViewDetail"
-        >
-          <i class="fas fa-info-circle"></i>
-          商品詳情
         </BaseButton>
       </div>
     </div>
@@ -357,6 +353,14 @@ const router = useRouter()
 .product-actions button {
   flex: 1;
   min-height: 36px;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.clickable-content:hover {
+  opacity: 0.8;
 }
 
 @keyframes loading {

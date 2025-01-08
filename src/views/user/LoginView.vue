@@ -1,12 +1,6 @@
 <template>
   <div class="login-view">
     <div class="login-container">
-      <div class="back-link">
-        <a @click="handleBack">
-          <i class="fas fa-arrow-left"></i> 返回
-        </a>
-      </div>
-
       <h2>登入 iLive</h2>
 
       <form @submit.prevent="handleSubmit" class="login-form">
@@ -138,13 +132,6 @@ import BaseButton from '@/components/common/BaseButton.vue'
 
 const router = useRouter()
     const store = useStore()
-    const handleBack = () => {
-      if (window.history.length > 2) {
-        router.go(-1)
-      } else {
-        router.push('/')
-      }
-    }
 
     // Reactive State
     const isLoading = ref(false)
@@ -270,22 +257,19 @@ const handleSubmit = async () => {
     globalError.value = ''
     successMessage.value = ''
 
-    const response = await login(formData.username.trim(), formData.password)
-
-    // 先更新 Vuex store
+    const response = await login(formData.username.trim(),formData.password)
     await store.dispatch('loginUser', response)
 
-    // 然後更新 localStorage
+    // 添加這段代碼將登入狀態存儲到 localStorage
+    localStorage.setItem('accessToken', response.accessToken)
+    localStorage.setItem('refreshToken', response.refreshToken)
+    localStorage.setItem('userId', response.user.userId)
+    localStorage.setItem('userName', response.user.username)
+
+    // Handle Remember Me
     if (formData.rememberMe) {
-      localStorage.setItem('accessToken', response.accessToken)
-      localStorage.setItem('refreshToken', response.refreshToken)
-      localStorage.setItem('userId', response.user.userId)
-      localStorage.setItem('userName', response.user.username)
       localStorage.setItem('rememberedUsername', formData.username)
     } else {
-      // 如果沒有勾選記住我，只存儲必要的登入資訊
-      localStorage.setItem('accessToken', response.accessToken)
-      localStorage.setItem('refreshToken', response.refreshToken)
       localStorage.removeItem('rememberedUsername')
     }
 
@@ -549,25 +533,4 @@ h2 {
     transform: translateY(0);
   }
 }
-.back-link {
-  margin-bottom: 1rem;
-}
-
-.back-link a {
-  display: inline-flex;
-  align-items: center;
-  color: #666;
-  cursor: pointer;
-  text-decoration: none;
-  transition: color 0.3s ease;
-}
-
-.back-link a:hover {
-  color: #4299e1;
-}
-
-.back-link i {
-  margin-right: 0.5rem;
-}
-
 </style>
