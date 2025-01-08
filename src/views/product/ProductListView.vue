@@ -162,30 +162,33 @@ const fetchData = async () => {
   error.value = null;
 
   try {
+    // 從路由獲取分類ID
     const categoryId = router.currentRoute.value.query.categoryId;
     console.log('Fetching data for categoryId:', categoryId);
 
-    let response;
+    let response = await getProductInfo(); // 獲取所有商品
+
+    // 根據商品名稱進行分類過濾
     if (categoryId) {
-      // 確保 categoryId 是數字
-      response = await getProductsByCategory(parseInt(categoryId));
-      console.log('Category filtered products:', response);
+      // 根據分類ID過濾商品
+      const filteredProducts = response.filter(product => {
+        if (categoryId === '11') { // 冰箱
+          return product.name.includes('冰箱');
+        } else if (categoryId === '12') { // 電視
+          return product.name.includes('顯示器') || product.name.includes('電視');
+        } else if (categoryId === '13') { // 洗衣機
+          return product.name.includes('洗衣機');
+        }
+        return true;
+      });
+
+      console.log('Category filtered products:', filteredProducts);
+      products.value = filteredProducts;
     } else {
-      response = await getProductInfo();
+      products.value = response;
     }
 
-    console.log('Received response:', response);
-
-    if (response && Array.isArray(response)) {
-      products.value = response.map(product => ({
-        ...product,
-        categoryId: parseInt(product.categoryId) // 確保 categoryId 是數字
-      }));
-    } else if (response) {
-      products.value = [response];
-    } else {
-      products.value = [];
-    }
+    console.log('Received response:', products.value);
 
   } catch (err) {
     console.error('載入商品失敗:', err);
