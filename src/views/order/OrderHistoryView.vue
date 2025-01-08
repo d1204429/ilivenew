@@ -8,8 +8,16 @@
           v-model="searchKeyword"
           placeholder="搜尋訂單編號"
           class="search-input"
+          @keyup.enter="handleSearch"
       />
       <BaseButton @click="handleSearch">搜尋</BaseButton>
+      <BaseButton
+          v-if="searchKeyword"
+          @click="clearSearch"
+          variant="outline"
+      >
+        清除搜尋
+      </BaseButton>
     </div>
 
     <!-- 訂單列表 -->
@@ -97,7 +105,10 @@ const orderStatusMap = {
 const getOrderStatus = (statusId) => {
   return orderStatusMap[statusId] || '未知狀態'
 }
-
+const clearSearch = () => {
+  searchKeyword.value = ''
+  fetchOrders()
+}
 // 資料狀態
 const orders = ref([])
 const searchKeyword = ref('')
@@ -140,9 +151,18 @@ const fetchOrders = async () => {
   try {
     const response = await getOrder(store.state.accessToken)
     if (response && Array.isArray(response)) {
-      orders.value = response.map(order => ({
+      let filteredOrders = response
+
+      // 如果有搜尋關鍵字，進行過濾
+      if (searchKeyword.value.trim()) {
+        filteredOrders = response.filter(order =>
+            order.orderId.toString().includes(searchKeyword.value.trim())
+        )
+      }
+
+      orders.value = filteredOrders.map(order => ({
         ...order,
-        orderItems: order.orderItems || []  // 確保 orderItems 存在
+        orderItems: order.orderItems || []
       }))
     } else {
       orders.value = []
@@ -152,11 +172,10 @@ const fetchOrders = async () => {
     orders.value = []
   }
 }
-
 // 搜尋處理
 const handleSearch = () => {
   currentPage.value = 1
-  fetchOrders()
+  fetchOrders() // 重新獲取並過濾訂單
 }
 
 // 切換頁面
