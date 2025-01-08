@@ -22,12 +22,17 @@
         </div>
         <div class="order-content">
           <div class="product-list">
-            <div v-for="item in order.items" :key="item.id" class="product-item">
-              <img :src="item.productImage" :alt="item.productName">
+            <div v-for="item in order.orderItems" :key="item.orderItemId" class="product-item">
+              <img
+                  :src="getImageUrl(item.product?.imageUrl)"
+                  :alt="item.product?.name"
+                  @error="handleImageError"
+                  class="product-image"
+              >
               <div class="product-info">
-                <h3>{{ item.productName }}</h3>
+                <h3>{{ item.product?.name }}</h3>
                 <p>數量: {{ item.quantity }}</p>
-                <p>單價: ${{ item.price }}</p>
+                <p>單價: ${{ formatPrice(item.product?.promotionalPrice || item.product?.originalPrice) }}</p>
               </div>
             </div>
           </div>
@@ -87,6 +92,23 @@ const searchKeyword = ref('')
 const currentPage = ref(1)
 const totalPages = ref(1)
 const pageSize = 10
+
+// 圖片 URL 處理
+const getImageUrl = (imagePath) => {
+  if (!imagePath) return ''
+  return imagePath
+}
+
+// 圖片載入失敗處理
+const handleImageError = (event) => {
+  event.target.src = '/default-image.jpg' // 可以設置一個默認圖片
+}
+
+// 金額格式化
+const formatPrice = (price) => {
+  return price?.toLocaleString('zh-TW') || '0'
+}
+
 
 // 初始化加載
 onMounted(async () => {
