@@ -12,6 +12,9 @@ export default [
         path: '/products',
         name: 'Products',
         component: () => import('@/views/product/ProductListView.vue'),
+        props: route => ({
+            categoryId: route.query.categoryId ? parseInt(route.query.categoryId) : null
+        }),
         meta: {
             title: '商品列表',
             keepAlive: true

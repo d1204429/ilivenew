@@ -43,7 +43,10 @@
               <router-link
                   v-for="category in categories"
                   :key="category.id"
-                  :to="{ path: '/products', query: { search: category.name } }"
+                  :to="{
+        name: 'Products',
+        query: { categoryId: category.id }
+    }"
                   class="dropdown-item"
                   @click="toggleMenu"
               >
@@ -72,12 +75,12 @@
             type="search"
             v-model="searchKeyword"
             placeholder="搜尋商品"
-            
+
             aria-label="搜尋"
         >
         <!-- @keyup.enter="handleSearch" -->
         <button
-            
+
             aria-label="搜尋按鈕"
         >
         <!-- @click="handleSearch" -->
@@ -98,7 +101,7 @@
               <router-link to="/orders" class="dropdown-item">訂單記錄</router-link>
               <button
                   class="dropdown-item"
-                  
+
               >登出</button>
               <!-- @click="handleLogout" -->
             </div>
@@ -143,8 +146,8 @@ const store = useStore()
 
 // Computed Properties
 const isLoggedIn = computed(() => !!store.state.accessToken)
-const currentUserName = computed(() => store.state.userName) 
-    
+const currentUserName = computed(() => store.state.userName)
+
     //const currentUser = computed(() => store.state.userId)
     //console.log(currentUser)
     // const cartItemCount = computed(() => store.getters['cart/itemCount'])
@@ -258,7 +261,7 @@ onUnmounted(() => {
         document.body.style.overflow = ''
       }
     }
-
+console.log('Selected category:', categories);
     // Watchers
     // watch(isLoggedIn, async (newValue, oldValue) => {
     //   if (newValue && newValue !== oldValue) {

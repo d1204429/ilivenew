@@ -13,7 +13,7 @@
             v-model="filters.keyword"
             placeholder="搜尋商品..."
             prefix-icon="fas fa-search"
-            
+
         />
         <!-- @input="handleSearch" -->
         <select v-model="filters.categoryId" @change="handleCategoryChange">
@@ -89,7 +89,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
+import {ref, reactive, computed, onMounted, watch} from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import ProductCard from '@/components/product/ProductCard.vue'
@@ -98,6 +98,21 @@ import BaseLoading from '@/components/common/BaseLoading.vue'
 import BaseAlert from '@/components/common/BaseAlert.vue'
 //import { debounce } from '@/utils/helpers'
 //import { handleError } from '@/utils/errorHandler'
+import { getProductsByCategory, getProductInfo } from '@/services/products'
+
+const props = defineProps({
+  categoryId: {
+    type: Number,
+    default: null
+  }
+})
+// 監聽 categoryId 變化
+watch(() => props.categoryId, (newCategoryId) => {
+  if (newCategoryId) {
+    filters.categoryId = newCategoryId
+    fetchData()
+  }
+})
 
 const store = useStore()
     const router = useRouter()
@@ -142,32 +157,39 @@ const store = useStore()
       }
     }
 
-    const fetchData = async () => {
-    //   loading.value = true
-    //   error.value = null
+const fetchData = async () => {
+  loading.value = true;
+  error.value = null;
 
-    //   try {
-    //     const params = {
-    //       page: pagination.currentPage,
-    //       limit: pagination.pageSize,
-    //       ...filters
-    //     }
+  try {
+    const categoryId = router.currentRoute.value.query.categoryId;
+    console.log('Fetching data for categoryId:', categoryId); // 添加日誌
 
-    //     const response = await store.dispatch('product/fetchProducts', params)
-    //     products.value = response.items.map(transformProductData)
-    //     pagination.total = response.total
-    //     pagination.totalPages = response.totalPages
-    //   } catch (err) {
-    //     const errorMessage = handleError(err)
-    //     store.dispatch('app/showNotification', {
-    //       type: 'error',
-    //       message: errorMessage || '載入商品失敗'
-    //     })
-    //     error.value = errorMessage
-    //   } finally {
-    //     loading.value = false
-    //   }
+    let response;
+    if (categoryId) {
+      response = await getProductsByCategory(categoryId);
+    } else {
+      response = await getProductInfo();
     }
+
+    console.log('Received response:', response); // 添加日誌
+
+    if (response && Array.isArray(response)) {
+      products.value = response;
+    } else if (response) {
+      products.value = [response];
+    } else {
+      products.value = [];
+    }
+
+  } catch (err) {
+    console.error('載入商品失敗:', err);
+    error.value = err.message || '載入商品失敗';
+    products.value = []; // 確保在錯誤時清空商品列表
+  } finally {
+    loading.value = false;
+  }
+};
 
     const fetchCategories = async () => {
     //   try {
@@ -229,10 +251,15 @@ const store = useStore()
     }
 
     // 生命週期
-    onMounted(() => {
-      fetchData()
-      fetchCategories()
-    })
+onMounted(() => {
+  console.log('Route query:', router.currentRoute.value.query);
+  console.log('Props categoryId:', props.categoryId);
+  if (props.categoryId) {
+    filters.categoryId = props.categoryId;
+  }
+  fetchData();
+  fetchCategories();
+});
 
 </script>
 
