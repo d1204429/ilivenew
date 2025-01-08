@@ -62,6 +62,23 @@
     </section>
   </div>
 </template>
+<script setup lang="ts">
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+const handleBack = () => {
+  try {
+    if (window.history.state?.back) {
+      router.go(-1)
+    } else {
+      router.push('/')
+    }
+  } catch (error) {
+    router.push('/')
+  }
+}
+</script>
 
 <style scoped>
 .about-container {
@@ -156,17 +173,4 @@ section {
 }
 
 </style>
-<script setup lang="ts">
-import { useRouter } from 'vue-router'
 
-const router = useRouter()
-
-const handleBack = () => {
-  if (window.history.length > 2) {
-    router.go(-1)
-  } else {
-    router.push('/')
-  }
-}
-
-</script>
