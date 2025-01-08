@@ -163,19 +163,24 @@ const fetchData = async () => {
 
   try {
     const categoryId = router.currentRoute.value.query.categoryId;
-    console.log('Fetching data for categoryId:', categoryId); // 添加日誌
+    console.log('Fetching data for categoryId:', categoryId);
 
     let response;
     if (categoryId) {
-      response = await getProductsByCategory(categoryId);
+      // 確保 categoryId 是數字
+      response = await getProductsByCategory(parseInt(categoryId));
+      console.log('Category filtered products:', response);
     } else {
       response = await getProductInfo();
     }
 
-    console.log('Received response:', response); // 添加日誌
+    console.log('Received response:', response);
 
     if (response && Array.isArray(response)) {
-      products.value = response;
+      products.value = response.map(product => ({
+        ...product,
+        categoryId: parseInt(product.categoryId) // 確保 categoryId 是數字
+      }));
     } else if (response) {
       products.value = [response];
     } else {
@@ -185,7 +190,7 @@ const fetchData = async () => {
   } catch (err) {
     console.error('載入商品失敗:', err);
     error.value = err.message || '載入商品失敗';
-    products.value = []; // 確保在錯誤時清空商品列表
+    products.value = [];
   } finally {
     loading.value = false;
   }
