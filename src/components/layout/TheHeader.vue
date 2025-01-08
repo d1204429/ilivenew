@@ -43,7 +43,7 @@
               <router-link
                   v-for="category in categories"
                   :key="category.id"
-                  :to="{ path: '/products', query: { search: category.name } }"
+                  :to="{ path: '/products', query: { search: category.id } }"
                   class="dropdown-item"
                   @click="toggleMenu"
               >
