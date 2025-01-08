@@ -2,7 +2,12 @@
   <div class="profile-container">
     <div class="profile-card">
       <!-- Header Section -->
-      <div class="profile-header">
+      <div class="profile-header"><div class="back-link">
+        <a @click="handleBack">
+          <i class="fas fa-arrow-left"></i> 返回
+        </a>
+      </div>
+
         <h2 class="title">個人資料</h2>
         <div class="action-buttons">
           <button
@@ -118,6 +123,13 @@ const store = useStore()
     const currentUser = ref()
     const retryCount = ref(0)
     const MAX_RETRIES = 3
+const handleBack = () => {
+  if (window.history.length > 2) {
+    router.go(-1)
+  } else {
+    router.push('/')
+  }
+}
 
     // Computed Properties
     //AuthService.isAuthenticated()
@@ -504,5 +516,25 @@ const initializeProfile = async () => {
     padding: 0.5rem 1rem;
     font-size: 0.813rem;
   }
+}.back-link {
+   margin-bottom: 1rem;
+ }
+
+.back-link a {
+  display: inline-flex;
+  align-items: center;
+  color: #666;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.3s ease;
 }
+
+.back-link a:hover {
+  color: #4299e1;
+}
+
+.back-link i {
+  margin-right: 0.5rem;
+}
+
 </style>

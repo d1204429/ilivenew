@@ -4,6 +4,12 @@
   <div class="container">
     <div class="row">
       <div class="col-12">
+        <div class="back-link">
+          <a @click="handleBack">
+            <i class="fas fa-arrow-left"></i> 返回
+          </a>
+        </div>
+
         <h2 class="mb-4">訂單詳細資訊</h2>
 
         <!-- 訂單基本資訊 -->
@@ -62,8 +68,9 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useStore } from 'vuex'
-import { useRoute } from 'vue-router'
+import {useRoute, useRouter} from 'vue-router'
 import { getOrderDetail } from '@/services/order'
+const router = useRouter()
 
 const store = useStore()
 const route = useRoute()
@@ -75,6 +82,13 @@ const order = ref({
   items: [],
   totalAmount: 0
 })
+const handleBack = () => {
+  if (window.history.length > 2) {
+    router.go(-1)
+  } else {
+    router.push('/')
+  }
+}
 
 // 訂單狀態對應
 const orderStatusMap = {
@@ -132,4 +146,25 @@ onMounted(() => {
 .text-end {
   text-align: right;
 }
+.back-link {
+  margin-bottom: 1rem;
+}
+
+.back-link a {
+  display: inline-flex;
+  align-items: center;
+  color: #666;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.back-link a:hover {
+  color: #4299e1;
+}
+
+.back-link i {
+  margin-right: 0.5rem;
+}
+
 </style>

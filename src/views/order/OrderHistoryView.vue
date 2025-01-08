@@ -1,6 +1,11 @@
 <template>
   <div class="order-history">
     <h1>訂單記錄</h1>
+    <div class="back-link">
+      <a @click="handleBack">
+        <i class="fas fa-arrow-left"></i> 返回
+      </a>
+    </div>
 
     <!-- 訂單篩選區 -->
     <div class="filter-section">
@@ -97,6 +102,13 @@ const orderStatusMap = {
   3: '已出貨',
   4: '已完成',
   5: '已取消'
+}
+const handleBack = () => {
+  if (window.history.length > 2) {
+    router.go(-1)
+  } else {
+    router.push('/')
+  }
 }
 
 const getOrderStatus = (statusId) => {
@@ -306,4 +318,25 @@ const formatDate = (dateString) => {
   margin: 4px 0;
   color: #666;
 }
+.back-link {
+  margin-bottom: 1rem;
+}
+
+.back-link a {
+  display: inline-flex;
+  align-items: center;
+  color: #666;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.back-link a:hover {
+  color: #4299e1;
+}
+
+.back-link i {
+  margin-right: 0.5rem;
+}
+
 </style>
