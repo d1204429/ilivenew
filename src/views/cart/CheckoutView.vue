@@ -217,17 +217,26 @@ const canProceed = computed(() => {
 
 // 方法
 const nextStep = async () => {
-    if (currentStep.value ==1) {
-        await processPayment()
-        currentStep.value++
-    } else {
-        if(selectedPayment.value === "credit"){
-           await creditPayment()
-        }else{
-
-        }
-        router.push('/orders')
+  if (currentStep.value === 1) {
+    const success = await processPayment()
+    if (success) {
+      currentStep.value++
     }
+  } else {
+    try {
+      if (selectedPayment.value === "credit") {
+        const success = await creditPayment()
+        if (success) {
+          router.push('/orders')
+        }
+      } else {
+        // 處理其他支付方式
+        router.push('/orders')
+      }
+    } catch (error) {
+      alert('付款處理失敗，請稍後再試')
+    }
+  }
 }
 
 // const previousStep = () => {
@@ -249,26 +258,42 @@ const formatPrice = (price) => {
 }
 
 const processPayment = async () => {
-    try {
+  try {
     loading.value = true
-    //console.log(store.state.accessToken)
-    const data = await createOrder(buyerInfo.value.address , store.state.accessToken)
-    orderId.value = data.data.orderId
-    console.log(orderId.value)
+    const response = await createOrder(buyerInfo.value.address, store.state.accessToken)
+    // 確保 response 有值且包含 data
+    if (response && response.data) {
+      orderId.value = response.data.orderId
+      console.log('Order created:', orderId.value)
+      return true // 返回成功標誌
+    } else {
+      throw new Error('訂單創建失敗: 伺服器回應異常')
+    }
   } catch (error) {
     console.error('轉訂單失敗:', error)
+    alert(error.response?.data?.message || '轉訂單失敗，請稍後再試')
+    return false // 返回失敗標誌
   } finally {
     loading.value = false
   }
 }
 
 const creditPayment = async () => {
-    try {
+  try {
     loading.value = true
-    //console.log(store.state.accessToken)
-    const data = await orderCreditPayment(orderId.value, cardInfo.value.number , store.state.accessToken)
+    const response = await orderCreditPayment(
+        orderId.value,
+        cardInfo.value.number,
+        store.state.accessToken
+    )
+    if (response && response.data) {
+      return true
+    }
+    throw new Error('付款處理失敗')
   } catch (error) {
     console.error('信用卡付款失敗:', error)
+    alert(error.response?.data?.message || '信用卡付款失敗，請稍後再試')
+    return false
   } finally {
     loading.value = false
   }
