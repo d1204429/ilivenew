@@ -257,19 +257,22 @@ const handleSubmit = async () => {
     globalError.value = ''
     successMessage.value = ''
 
-    const response = await login(formData.username.trim(),formData.password)
+    const response = await login(formData.username.trim(), formData.password)
+
+    // 先更新 Vuex store
     await store.dispatch('loginUser', response)
 
-    // 添加這段代碼將登入狀態存儲到 localStorage
-    localStorage.setItem('accessToken', response.accessToken)
-    localStorage.setItem('refreshToken', response.refreshToken)
-    localStorage.setItem('userId', response.user.userId)
-    localStorage.setItem('userName', response.user.username)
-
-    // Handle Remember Me
+    // 然後更新 localStorage
     if (formData.rememberMe) {
+      localStorage.setItem('accessToken', response.accessToken)
+      localStorage.setItem('refreshToken', response.refreshToken)
+      localStorage.setItem('userId', response.user.userId)
+      localStorage.setItem('userName', response.user.username)
       localStorage.setItem('rememberedUsername', formData.username)
     } else {
+      // 如果沒有勾選記住我，只存儲必要的登入資訊
+      localStorage.setItem('accessToken', response.accessToken)
+      localStorage.setItem('refreshToken', response.refreshToken)
       localStorage.removeItem('rememberedUsername')
     }
 
