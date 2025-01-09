@@ -1,5 +1,10 @@
 <template>
   <div class="checkout-view">
+    <div class="back-link">
+      <a @click="handleBack">
+        <i class="fas fa-arrow-left"></i> 返回
+      </a>
+    </div>
     <!-- 結帳流程進度條 -->
     <div class="checkout-steps">
       <div class="step" :class="{ active: currentStep >= 1 }">填寫資料</div>
@@ -152,7 +157,13 @@ const buyerInfo = ref({
     phone: '',
     address: ''
 })
-
+const handleBack = () => {
+  if (window.history.length > 2) {
+    router.go(-1)
+  } else {
+    router.push('/')
+  }
+}
 // 運送方式
 const shippingMethods = [
     //{ id: 'home', name: '宅配到府', description: '2-3 個工作天到貨', price: 60 },
@@ -376,6 +387,33 @@ onMounted(() => {
   }
 }
 
+.back-link {
+  margin-bottom: 1.5rem;
+}
+
+.back-link a {
+  display: inline-flex;
+  align-items: center;
+  color: #34495e;
+  font-size: 1rem;
+  cursor: pointer;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  background: #f8f9fa;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.back-link a:hover {
+  background: #e9ecef;
+  color: #2c3e50;
+  transform: translateX(-5px);
+}
+
+.back-link i {
+  margin-right: 0.5rem;
+}
+
 .checkout-steps {
   display: flex;
   justify-content: center;
@@ -424,13 +462,14 @@ onMounted(() => {
   border: 2px solid #e9ecef;
   border-radius: 8px;
   font-size: 1rem;
-  transition: border-color 0.3s ease;
+  transition: all 0.3s ease;
   background: #f8f9fa;
 }
 
 .form-group input:focus {
   border-color: #3498db;
   outline: none;
+  box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.15);
 }
 
 .shipping-options,
@@ -562,40 +601,24 @@ onMounted(() => {
   margin-top: 2rem;
 }
 
-.btn-back,
 .btn-next {
-  padding: 0.875rem 2.5rem;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.btn-back {
-  background: #f8f9fa;
-  border: 2px solid #e9ecef;
-  color: #2c3e50;
-}
-
-.btn-back:hover {
-  background: #e9ecef;
-  transform: translateY(-2px);
-}
-
-.btn-next {
+  padding: 0.75rem 1.5rem;
+  font-size: 0.95rem;
+  border: none;
+  border-radius: 6px;
   background: #3498db;
   color: white;
-  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
-.btn-next:hover {
+.btn-next:hover:not(:disabled) {
   background: #2980b9;
   transform: translateY(-2px);
 }
 
 .btn-next:disabled {
-  background: #bdc3c7;
+  opacity: 0.7;
   cursor: not-allowed;
   transform: none;
 }
@@ -620,10 +643,6 @@ onMounted(() => {
     padding: 1.5rem;
   }
 
-  .address-inputs {
-    grid-template-columns: 1fr;
-  }
-
   .form-row {
     grid-template-columns: 1fr;
   }
@@ -642,10 +661,28 @@ onMounted(() => {
     flex-direction: column;
   }
 
-  .btn-back,
   .btn-next {
     width: 100%;
     text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .checkout-view {
+    padding: 0.75rem;
+  }
+
+  .checkout-section,
+  .order-summary {
+    padding: 1rem;
+  }
+
+  .form-group {
+    margin-bottom: 1.25rem;
+  }
+
+  .form-group input {
+    padding: 0.625rem 0.875rem;
   }
 }
 </style>
