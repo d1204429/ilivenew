@@ -18,6 +18,15 @@ export default [
     //     }
     // },
     {
+        path: '/promotion-product',
+        name: 'PromotionProduct',
+        component: () => import('@/views/promotion/PromotionProduct.vue'),
+        meta: {
+            title: '商品列表',
+            keepAlive: true
+        }
+    },
+    {
         path: '/category/:id',
         name: 'Category',
         component: () => import('@/views/product/ProductListView.vue'),

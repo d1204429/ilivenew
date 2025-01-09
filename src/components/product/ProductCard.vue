@@ -111,8 +111,7 @@ const router = useRouter()
     )
 
     const hasDiscount = computed(() =>
-        props.product.originalPrice &&
-        props.product.originalPrice > props.product.price
+        props.product.promotionalPrice < props.product.originalPrice
     )
 
     const stockStatusClass = computed(() => ({

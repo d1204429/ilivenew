@@ -42,7 +42,8 @@
       <div class="promotions-grid">
         <div v-for="promotion in activePromotions"
              :key="promotion.promotionId"
-             class="promotion-card">
+             class="promotion-card"
+             @click="navPromtProduct">
           <div class="promotion-content">
             <h3>{{ promotion.title }}</h3>
             <p class="promotion-description">{{ promotion.description }}</p>
@@ -87,12 +88,12 @@
 import { ref, onMounted, computed } from 'vue'
 import { getPromotions } from '@/services/promotion'
 import { getPromotionProduct, getProductInfo } from '@/services/products'
-// import { useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import ProductCard from '@/components/product/ProductCard.vue'
 import PromotionProductCarousel from '@/components/carousel/PromotionProductCarousel.vue'
 
-//const router = useRouter()
+const router = useRouter()
 const store = useStore()
 const isSearching = computed(() => store.state.isSearching)
 const searchResults = computed(() => store.state.searchResults)
@@ -136,7 +137,8 @@ const promotion = ref([])
 // 獲取促銷活動和商品資料
 const getPromotionsData = async () => {
   try {
-    activePromotions.value = await getPromotions()
+    const data = await getPromotions()
+    activePromotions.value = data.filter(Promot => Promot.isActive)
     promotion.value = await getPromotionProduct() 
     await getpromtProdInfo()
     //productPromotions.value = await getPromotionProduct()
@@ -161,6 +163,10 @@ return new Date(dateString).toLocaleDateString('zh-TW')
 // 格式化折扣顯示
 const formatDiscount = (type, value) => {
   return type === 'PERCENTAGE' ? `${value}% OFF` : `$${value} 折扣`
+}
+
+const navPromtProduct = ()=>{
+  router.push('/promotion-product')
 }
 </script>
 
