@@ -2,7 +2,8 @@
   <div class="profile-container">
     <div class="profile-card">
       <!-- Header Section -->
-      <div class="profile-header"><div class="back-link">
+      <div class="profile-header">
+        <div class="back-link">
         <a @click="handleBack">
           <i class="fas fa-arrow-left"></i> 返回
         </a>
