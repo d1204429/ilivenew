@@ -1,95 +1,89 @@
 import {api} from '@/utils/axios'
 
-// 創建訂單
 async function createOrder(shippingAddress, bearToken) {
-    try {
-        const response = await api.post('/orders',
-            {
-                shippingAddress: shippingAddress
+    const response = await api.post('/orders',
+        {
+            shippingAddress: shippingAddress
+        },
+        {
+            headers: {
+                Authorization: `Bearer ${bearToken}`,
             },
-            {
-                headers: {
-                    Authorization: `Bearer ${bearToken}`,
-                },
-            });
-        return response.data;
-    } catch (error) {
-        console.error('創建訂單失敗:', error);
-        throw error;
-    }
+        })
+        .catch(function (error) {
+            console.log(error.toJSON());
+        });
+    const data = await response.data;
+    console.log(data)
+    return data;
 }
 
-// 信用卡支付
-async function orderCreditPayment(orderId, cardNumber, bearToken) {
-    try {
-        const response = await api.post(`/orders/${orderId}/payment`,
-            {
-                paymentMethod: "CREDIT_CARD",
-                cardNumber: cardNumber
+async function orderCreditPayment(orderId, cardNumber, bearToken){
+    const response = await api.post(`/orders/${orderId}/payment`,
+        {
+            paymentMethod : "CREDIT_CARD",
+            cardNumber: cardNumber
+        },
+        {
+            headers: {
+                Authorization: `Bearer ${bearToken}`,
             },
-            {
-                headers: {
-                    Authorization: `Bearer ${bearToken}`,
-                },
-            });
-        return response.data;
-    } catch (error) {
-        console.error('信用卡支付失敗:', error);
-        throw error;
-    }
+        })
+        .catch(function (error) {
+            console.log(error.toJSON());
+        });
+    const data = await response.data;
+    console.log(data)
+    return data;
 }
 
-// Apple Pay 支付
-async function orderApplePayPayment(orderId, applePayToken, bearToken) {
-    try {
-        const response = await api.post(`/orders/${orderId}/payment`,
-            {
-                paymentMethod: "APPLE_PAY",
-                applePayToken: applePayToken
+async function orderApplePayPayment(orderId, applePayToken, bearToken){
+    const response = await api.post(`/orders/${orderId}/payment`,
+        {
+            paymentMethod : "APPLE_PAY",
+            applePayToken: applePayToken
+        },
+        {
+            headers: {
+                Authorization: `Bearer ${bearToken}`,
             },
-            {
-                headers: {
-                    Authorization: `Bearer ${bearToken}`,
-                },
-            });
-        return response.data;
-    } catch (error) {
-        console.error('Apple Pay 支付失敗:', error);
-        throw error;
-    }
+        })
+        .catch(function (error) {
+            console.log(error.toJSON());
+        });
+    const data = await response.data;
+    console.log(data)
+    return data;
 }
 
-// 獲取所有訂單
-async function getOrder(bearToken) {
-    try {
-        const response = await api.get('/orders/all',
-            {
-                headers: {
-                    Authorization: `Bearer ${bearToken}`,
-                },
-            });
-        // 確保返回陣列，即使是空的
-        return response?.data?.orders || [];
-    } catch (error) {
-        console.error('獲取訂單列表失敗:', error);
-        throw error;
-    }
+async function getOrder(bearToken){
+    const response = await api.get('/orders/all',
+        {
+            headers: {
+                Authorization: `Bearer ${bearToken}`,
+            },
+        })
+        .catch(function (error) {
+            console.log(error.toJSON());
+        });
+    const data = await response.data;
+    //console.log(data.orders)
+    return data.orders;
 }
 
-// 獲取訂單詳情
-async function getOrderDetail(orderId, bearToken) {
-    try {
-        const response = await api.get(`/orders/${orderId}`,
-            {
-                headers: {
-                    Authorization: `Bearer ${bearToken}`,
-                },
-            });
-        return response.data?.data;
-    } catch (error) {
-        console.error('獲取訂單詳情失敗:', error);
-        throw error;
-    }
+async function getOrderDetail(orderId ,bearToken){
+    const response = await api.get(`/orders/${orderId}`,
+        {
+            headers: {
+                Authorization: `Bearer ${bearToken}`,
+            },
+        })
+        .catch(function (error) {
+            console.log(error.toJSON());
+        });
+    const data = await response.data;
+    console.log(data.data)
+    return data.data;
 }
 
 export {createOrder, orderCreditPayment, orderApplePayPayment, getOrder, getOrderDetail}

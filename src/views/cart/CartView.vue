@@ -1,5 +1,10 @@
 <template>
   <div class="cart-view">
+    <div class="back-link">
+      <a @click="handleBack">
+        <i class="fas fa-arrow-left"></i> 返回
+      </a>
+    </div>
     <!-- 購物車標題 -->
     <div class="cart-header">
       <h1>購物車</h1>
@@ -69,7 +74,7 @@ const calculateTotal = computed(() => {
 
 // 檢查數據是否都準備好
 const isDataReady = computed(() => {
-  return cartItems.value?.length > 0 && 
+  return cartItems.value?.length > 0 &&
          prodItems.value?.length > 0 &&
          cartItems.value.length === prodItems.value.length
 })
@@ -84,7 +89,7 @@ const fetchCartItems = async () => {
     //console.log(store.state.accessToken)
     const data = await getCartItems(store.state.accessToken)
     cartItems.value = data
-    
+
   } catch (error) {
     console.error('獲取購物車失敗:', error)
   } finally {
@@ -148,7 +153,13 @@ const initData = async () => {
     loading.value = false
   }
 }
-
+const handleBack = () => {
+  if (window.history.length > 2) {
+    router.go(-1)
+  } else {
+    router.push('/')
+  }
+}
 onMounted(() => {
   initData()
 })
@@ -220,4 +231,29 @@ onMounted(() => {
     box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
   }
 }
+.btn {
+  padding: 0.5rem 1rem;
+  font-size: 0.813rem;
+}
+.back-link {
+   margin-bottom: 1rem;
+ }
+
+.back-link a {
+  display: inline-flex;
+  align-items: center;
+  color: #666;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.back-link a:hover {
+  color: #4299e1;
+}
+
+.back-link i {
+  margin-right: 0.5rem;
+}
+
 </style>
