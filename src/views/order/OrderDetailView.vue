@@ -158,36 +158,303 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.order-history,
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: linear-gradient(-45deg, #fff3e0, #ffe0b2, #ffecb3, #fff8e1);
+  background-size: 400% 400%;
+  animation: gradientBG 15s ease infinite;
+  min-height: 100vh;
+}
+
+@keyframes gradientBG {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+h1, h2 {
+  color: #2c3e50;
+  font-weight: 500;
+  margin-bottom: 1.5rem;
+}
+
+.back-link {
+  margin-bottom: 1.5rem;
+}
+
+.back-link a {
+  display: inline-flex;
+  align-items: center;
+  color: #34495e;
+  font-size: 1rem;
+  cursor: pointer;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  background: #ffffff;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.back-link a:hover {
+  background: #f8f9fa;
+  color: #3498db;
+  transform: translateY(-2px);
+}
+
+.back-link i {
+  margin-right: 0.5rem;
+}
+
+.filter-section {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.search-input {
+  width: 300px;
+  padding: 0.75rem 1rem;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  transition: border-color 0.3s ease;
+}
+
+.search-input:focus {
+  border-color: #3498db;
+  outline: none;
+}
+
+.order-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.order-item {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease;
+}
+
+.order-item:hover {
+  transform: translateY(-2px);
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #f8f9fa;
+  color: #2c3e50;
+}
+
+.order-content {
+  padding: 1.5rem 0;
+}
+
+.product-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.product-item {
+  display: flex;
+  gap: 1.5rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.product-item img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.product-info {
+  flex: 1;
+}
+
+.product-info h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.1rem;
+  color: #2c3e50;
+  font-weight: 500;
+}
+
+.product-info p {
+  margin: 0.25rem 0;
+  color: #7f8c8d;
+}
+
+.order-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 1rem;
+  border-top: 2px solid #f8f9fa;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding: 1rem;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.no-orders {
+  text-align: center;
+  padding: 3rem;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  margin-bottom: 1.5rem;
+  border: none;
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+.card-title {
+  color: #2c3e50;
+  font-weight: 500;
+  margin-bottom: 1.5rem;
+}
+
+.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
 .table th {
+  background-color: #f8f9fa;
+  color: #2c3e50;
+  font-weight: 500;
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 2px solid #e9ecef;
+}
+
+.table td {
+  padding: 1rem;
+  color: #2c3e50;
+  border-bottom: 1px solid #f8f9fa;
+  vertical-align: middle;
+}
+
+.table tbody tr:hover {
   background-color: #f8f9fa;
 }
 
-.table td, .table th {
-  vertical-align: middle;
+.table tfoot td {
+  border-top: 2px solid #e9ecef;
+  font-weight: 500;
 }
 
 .text-end {
   text-align: right;
 }
 
-.back-link {
-  margin-bottom: 1rem;
-}
-
-.back-link a {
-  display: inline-flex;
-  align-items: center;
-  color: #666;
+/* 按鈕統一樣式 */
+.btn,
+button[class*="btn"],
+:deep(.base-button) {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  border: none;
   cursor: pointer;
-  text-decoration: none;
-  transition: color 0.3s ease;
+  background: #3498db;
+  color: white;
 }
 
-.back-link a:hover {
-  color: #4299e1;
+.btn:hover,
+button[class*="btn"]:hover,
+:deep(.base-button:hover) {
+  transform: translateY(-2px);
+  background: #2980b9;
 }
 
-.back-link i {
-  margin-right: 0.5rem;
+.btn[variant="outline"],
+button[variant="outline"],
+:deep(.base-button[variant="outline"]) {
+  background: transparent;
+  border: 2px solid #3498db;
+  color: #3498db;
+}
+
+.btn[variant="outline"]:hover,
+button[variant="outline"]:hover,
+:deep(.base-button[variant="outline"]:hover) {
+  background: #3498db;
+  color: white;
+}
+
+@media (max-width: 768px) {
+  .order-history,
+  .container {
+    padding: 1rem;
+  }
+
+  .filter-section {
+    flex-direction: column;
+  }
+
+  .search-input {
+    width: 100%;
+  }
+
+  .order-header {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .product-item {
+    flex-direction: column;
+  }
+
+  .product-item img {
+    width: 100%;
+    height: 200px;
+  }
+
+  .table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .pagination {
+    flex-wrap: wrap;
+  }
 }
 </style>
