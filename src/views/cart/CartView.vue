@@ -14,7 +14,7 @@
     <div class="cart-container">
       <div  v-if="cartItems.length > 0">
         <button class="text-gray-600 hover:text-red-600"
-        @click="deleteCart">清空購物車</button>
+        @click="deleteCart">移除所有商品</button>
       </div>
       <!-- 購物車列表 -->
       <div>

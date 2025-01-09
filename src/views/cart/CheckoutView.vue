@@ -121,7 +121,7 @@
           @click="nextStep"
           :disabled="!canProceed"
       >
-        {{ currentStep === 1 ? '轉訂單' : '結帳' }}
+        {{ currentStep === 1 ? '去下單' : '結帳' }}
       </button>
     </div>
   </div>

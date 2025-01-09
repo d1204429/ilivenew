@@ -10,7 +10,7 @@
 
     <section class="company-intro">
       <h2>公司簡介</h2>
-      <p>iLive 是您值得信賴的電器用品購物平台，致力於提供優質的家電產品和卓越的購物體驗。全年全日所有商品皆享免運優惠，讓您輕鬆購物無負擔。</p>
+      <p>iLive 是您值得信賴的電器用品購物平台，致力於提供優質的家電產品和卓越的購物體驗。全年全館所有商品皆享免運優惠，讓您輕鬆購物無負擔。</p>
     </section>
 
     <section class="company-value">
@@ -23,8 +23,8 @@
         </div>
         <div class="value-card">
           <i class="fas fa-truck"></i>
-          <h3>全年免運</h3>
-          <p>所有商品全年全日免運費，讓您安心購物</p>
+          <h3>全館免運</h3>
+          <p>所有商品全年全館免運費，讓您安心購物</p>
         </div>
         <div class="value-card">
           <i class="fas fa-headset"></i>
