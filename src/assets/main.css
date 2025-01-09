@@ -1,149 +1,92 @@
-@import './base.css';
-/* 全局樣式 */
+/* 全局樣式重置 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* 基礎變量定義 */
 :root {
-  --primary-font: 'Noto Sans TC', sans-serif;
-  --header-height: 80px;
-  --footer-height: 60px;
-  --primary-color: #e67e22;
-  --secondary-color: #f39c12;
-  --background-color: #fff9e6;
-  --text-color: #5d4037;
-  --border-color: #f0e6d2;
+  --primary-color: #e67e22;          /* 溫暖橙色 */
+  --secondary-color: #f39c12;        /* 柔和黃色 */
+  --text-color: #5d4037;            /* 暖棕色文字 */
+  --background-color-start: #FFF9E6;  /* 起始背景色 */
+  --background-color-end: #FFF0A4;    /* 結束背景色 */
+  --border-color: #f0e6d2;          /* 米色邊框 */
+  --success-color: #27ae60;         /* 柔和綠色 */
+  --warning-color: #f1c40f;         /* 溫暖黃色 */
+  --danger-color: #e74c3c;          /* 柔和紅色 */
+  --max-width: 1200px;
   --shadow-color: rgba(210, 180, 140, 0.2);
 }
 
-/* 基礎布局 */
+/* 定義背景動畫 */
+@keyframes backgroundGradient {
+  0% {
+    background-color: var(--background-color-start);
+  }
+  50% {
+    background-color: var(--background-color-end);
+  }
+  100% {
+    background-color: var(--background-color-start);
+  }
+}
+
+/* 基礎排版 */
 body {
-  font-family: var(--primary-font);
+  font-family: "Noto Sans TC", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   line-height: 1.6;
-  margin: 0;
-  padding: 0;
-  background-color: var(--background-color);
   color: var(--text-color);
+  animation: backgroundGradient 4.5s ease-in-out infinite;
 }
 
-/* 導航欄樣式 */
-.nav-container {
-  height: var(--header-height);
-  background-color: #ffffff;
-  box-shadow: 0 4px 12px var(--shadow-color);
-  border-bottom: 1px solid var(--border-color);
-}
-
-.nav-menu {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 2.5rem;
-}
-
-/* 首頁樣式 */
-.hero-section {
-  height: calc(100vh - var(--header-height));
-  background-size: cover;
-  background-position: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: var(--background-color);
-}
-
-/* 商品列表樣式 */
-.product-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 2.5rem;
-  padding: 2.5rem;
-}
-
-.product-card {
-  background: #ffffff;
-  border-radius: 12px;
-  overflow: hidden;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px var(--shadow-color);
-  border: 1px solid var(--border-color);
-}
-
-.product-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 6px 16px var(--shadow-color);
-}
-
-.product-image {
+/* 容器樣式 */
+.container {
   width: 100%;
-  height: 220px;
-  object-fit: cover;
+  padding-right: 20px;
+  padding-left: 20px;
+  margin-right: auto;
+  margin-left: auto;
+  max-width: var(--max-width);
 }
 
-.product-info {
-  padding: 1.5rem;
+/* 頁面標題樣式 */
+.page-title {
+  font-size: 2.2rem;
+  font-weight: 600;
+  color: var(--primary-color);
+  margin-bottom: 1.8rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 2px solid var(--border-color);
 }
 
-/* 購物車樣式 */
-.cart-container {
-  padding: 2.5rem;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.cart-item {
-  display: grid;
-  grid-template-columns: 100px 2fr 1fr 1fr auto;
-  align-items: center;
-  padding: 1.5rem;
-  background: #ffffff;
-  border-radius: 8px;
-  margin-bottom: 1rem;
-  border: 1px solid var(--border-color);
-  box-shadow: 0 2px 8px var(--shadow-color);
-}
-
-.cart-summary {
-  margin-top: 2.5rem;
-  padding: 1.5rem;
-  background: #ffffff;
-  border-radius: 12px;
-  border: 1px solid var(--border-color);
-  box-shadow: 0 4px 12px var(--shadow-color);
-}
-
-/* 登入/註冊表單樣式 */
-.auth-form {
-  max-width: 400px;
-  margin: 2.5rem auto;
-  padding: 2.5rem;
+/* 卡片樣式 */
+.card {
   background: #ffffff;
   border-radius: 12px;
   box-shadow: 0 4px 12px var(--shadow-color);
+  padding: 1.8rem;
+  margin-bottom: 1.8rem;
   border: 1px solid var(--border-color);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.form-group {
-  margin-bottom: 1.5rem;
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(210, 180, 140, 0.3);
 }
 
-.form-control {
-  width: 100%;
-  padding: 0.875rem;
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  transition: border-color 0.3s ease;
-}
-
-.form-control:focus {
-  border-color: var(--primary-color);
-  outline: none;
-}
-
-/* 按鈕樣式 */
+/* 按鈕基礎樣式 */
 .btn {
-  padding: 0.875rem 1.75rem;
-  border: none;
+  display: inline-block;
+  font-weight: 500;
+  text-align: center;
+  padding: 0.8rem 1.5rem;
   border-radius: 8px;
+  border: 1px solid transparent;
   cursor: pointer;
   transition: all 0.3s ease;
-  font-weight: 500;
 }
 
 .btn-primary {
@@ -155,73 +98,115 @@ body {
   background-color: var(--secondary-color);
 }
 
-.btn-danger {
-  background-color: #e74c3c;
+.btn-secondary {
+  background-color: var(--secondary-color);
   color: #ffffff;
 }
 
-.btn-danger:hover {
-  background-color: #c0392b;
-}
-
-/* RWD 響應式設計 */
-@media (max-width: 768px) {
-  .product-grid {
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 1.5rem;
-    padding: 1.5rem;
-  }
-
-  .cart-item {
-    grid-template-columns: 80px 1fr;
-    gap: 1.5rem;
-  }
-
-  .nav-menu {
-    padding: 0 1.5rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .product-grid {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-  }
-
-  .auth-form {
-    margin: 1.5rem;
-    padding: 1.5rem;
-  }
-}
-
-/* 結帳頁面樣式 */
-.checkout-form {
-  max-width: 800px;
-  margin: 2.5rem auto;
-  padding: 2.5rem;
-  background: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px var(--shadow-color);
+/* 表單元素樣式 */
+.form-control {
+  width: 100%;
+  padding: 0.8rem 1rem;
   border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 1rem;
+  line-height: 1.6;
+  transition: border-color 0.3s ease;
 }
 
-.checkout-section {
-  margin-bottom: 2.5rem;
-  padding-bottom: 2.5rem;
+.form-control:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.1);
+}
+
+/* 網格系統 */
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-right: -20px;
+  margin-left: -20px;
+}
+
+.col {
+  position: relative;
+  width: 100%;
+  padding-right: 20px;
+  padding-left: 20px;
+}
+
+/* 導航欄樣式 */
+.navbar {
+  background-color: #ffffff;
+  padding: 1.2rem 0;
+  box-shadow: 0 4px 12px var(--shadow-color);
   border-bottom: 1px solid var(--border-color);
 }
 
-/* 訂單記錄樣式 */
-.order-history {
-  max-width: 1000px;
-  margin: 2.5rem auto;
+/* 商品列表樣式 */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 2rem;
+  padding: 2rem 0;
 }
 
-.order-item {
+/* 購物車樣式 */
+.cart-item {
+  display: flex;
+  align-items: center;
+  padding: 1.2rem;
+  border-radius: 8px;
   background: #ffffff;
-  padding: 1.8rem;
-  margin-bottom: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px var(--shadow-color);
   border: 1px solid var(--border-color);
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 8px var(--shadow-color);
+}
+
+/* 表單驗證樣式 */
+.form-control.is-invalid {
+  border-color: var(--danger-color);
+  background-color: #fff5f5;
+}
+
+.invalid-feedback {
+  color: var(--danger-color);
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+  padding-left: 0.5rem;
+}
+
+/* 工具類 */
+.text-center { text-align: center; }
+.mt-3 { margin-top: 1.2rem; }
+.mb-3 { margin-bottom: 1.2rem; }
+.p-3 { padding: 1.2rem; }
+
+/* RWD 斷點 */
+@media (max-width: 576px) {
+  .container {
+    max-width: 100%;
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+
+  .page-title {
+    font-size: 1.8rem;
+  }
+}
+
+@media (min-width: 576px) {
+  .container { max-width: 540px; }
+}
+
+@media (min-width: 768px) {
+  .container { max-width: 720px; }
+}
+
+@media (min-width: 992px) {
+  .container { max-width: 960px; }
+}
+
+@media (min-width: 1200px) {
+  .container { max-width: var(--max-width); }
 }
