@@ -1,10 +1,16 @@
 <template>
   <div class="about-container">
+    <div class="back-link">
+      <a @click="handleBack">
+        <i class="fas fa-arrow-left"></i> 返回
+      </a>
+    </div>
+
     <h1 class="page-title">關於我們</h1>
 
     <section class="company-intro">
       <h2>公司簡介</h2>
-      <p>iLive 是您值得信賴的電器用品購物平台，致力於提供優質的家電產品和卓越的購物體驗。</p>
+      <p>iLive 是您值得信賴的電器用品購物平台，致力於提供優質的家電產品和卓越的購物體驗。全年全日所有商品皆享免運優惠，讓您輕鬆購物無負擔。</p>
     </section>
 
     <section class="company-value">
@@ -16,14 +22,19 @@
           <p>嚴選優質商品，確保每件產品都符合高標準</p>
         </div>
         <div class="value-card">
-          <i class="fas fa-shipping-fast"></i>
-          <h3>快速配送</h3>
-          <p>專業物流團隊，讓您購物無需久候</p>
+          <i class="fas fa-truck"></i>
+          <h3>全年免運</h3>
+          <p>所有商品全年全日免運費，讓您安心購物</p>
         </div>
         <div class="value-card">
           <i class="fas fa-headset"></i>
           <h3>專業服務</h3>
           <p>貼心的客戶服務，解決您的所有疑問</p>
+        </div>
+        <div class="value-card">
+          <i class="fas fa-shipping-fast"></i>
+          <h3>快速配送</h3>
+          <p>專業物流團隊，讓您購物無需久候</p>
         </div>
       </div>
     </section>
@@ -45,12 +56,29 @@
         </div>
         <div class="timeline-item">
           <div class="year">2023</div>
-          <div class="content">會員數突破10萬</div>
+          <div class="content">會員數突破10萬，推出全年免運服務</div>
         </div>
       </div>
     </section>
   </div>
 </template>
+<script setup lang="ts">
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+const handleBack = () => {
+  try {
+    if (window.history.state?.back) {
+      router.go(-1)
+    } else {
+      router.push('/')
+    }
+  } catch (error) {
+    router.push('/')
+  }
+}
+</script>
 
 <style scoped>
 .about-container {
@@ -82,10 +110,12 @@ section {
   background: #f8f9fa;
   border-radius: 8px;
   transition: transform 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .value-card:hover {
   transform: translateY(-5px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
 }
 
 .value-card i {
@@ -116,5 +146,30 @@ section {
   .value-cards {
     grid-template-columns: 1fr;
   }
+
+  .value-card {
+    margin-bottom: 1rem;
+  }
 }
+.back-link {
+  margin-bottom: 1rem;
+}
+
+.back-link a {
+  display: inline-flex;
+  align-items: center;
+  color: #666;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.back-link a:hover {
+  color: #4299e1;
+}
+
+.back-link i {
+  margin-right: 0.5rem;
+}
+
 </style>
