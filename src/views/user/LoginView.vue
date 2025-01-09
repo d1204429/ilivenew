@@ -113,10 +113,10 @@
 
         <!-- Additional Options -->
         <div class="additional-options">
-          <router-link to="/forgot-password" class="forgot-password">
-            <i class="fas fa-key"></i>
-            忘記密碼？
-          </router-link>
+<!--          <router-link to="/forgot-password" class="forgot-password">-->
+<!--            <i class="fas fa-key"></i>-->
+<!--            忘記密碼？-->
+<!--          </router-link>-->
           <router-link to="/register" class="register">
             <i class="fas fa-user-plus"></i>
             註冊新帳號
