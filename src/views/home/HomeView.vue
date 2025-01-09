@@ -5,9 +5,12 @@
       <button class="carousel-control left" @click="prevSlide">
         <i class="fas fa-chevron-left"></i>
       </button>
-      <!--   -->
       <div class="carousel-inner2" :style="{ transform: `translateX(-${currentSlide * 100}%)` }">
-        <div v-for="(slide, index) in carouselSlides" :key="index" class="carousel-slide">
+        <div v-for="(slide, index) in carouselSlides"
+             :key="index"
+             class="carousel-slide"
+             :class="{ 'cursor-pointer': slide.link }"
+             @click="handleSlideClick(slide)">
           <img :src="slide.image" :alt="slide.caption">
           <div class="carousel-caption">{{ slide.caption }}</div>
         </div>
@@ -87,7 +90,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { getPromotions } from '@/services/promotion'
 import { getPromotionProduct, getProductInfo } from '@/services/products'
-// import { useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import ProductCard from '@/components/product/ProductCard.vue'
 import PromotionProductCarousel from '@/components/carousel/PromotionProductCarousel.vue'
@@ -97,6 +100,7 @@ const store = useStore()
 const isSearching = computed(() => store.state.isSearching)
 const searchResults = computed(() => store.state.searchResults)
 const isTypeSearch = computed(()=> store.state.isTypeSearch)
+const router = useRouter()
 
 //初始get promotionData
 onMounted(() => {
@@ -108,17 +112,28 @@ const currentSlide = ref(0)
 const carouselSlides = ref([
   {
     image: '/src/assets/carousel/ilive1.webp',
-    caption: '新品上市'
+    caption: '全館免運',
+    link: null
   },
   {
     image: '/src/assets/carousel/ilive2.webp',
-    caption: '限時特惠'
+    caption: '限時特惠',
+    link: null
   },
   {
     image: '/src/assets/carousel/login.webp',
-    caption: '立即登入'
+    caption: '立即登入',
+    link: '/login'  // 添加登入頁面路由
   }
 ])
+
+// 處理輪播圖點擊
+const handleSlideClick = (slide) => {
+  if (slide.link) {
+    router.push(slide.link)
+  }
+}
+
 // 輪播控制
 const prevSlide = () => {
   currentSlide.value = (currentSlide.value - 1 + carouselSlides.value.length) % carouselSlides.value.length
@@ -165,6 +180,10 @@ const formatDiscount = (type, value) => {
 </script>
 
 <style scoped>
+.cursor-pointer {
+  cursor: pointer;
+}
+
 .home-view {
   padding: 0rem;
   max-width: 1200px;

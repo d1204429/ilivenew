@@ -170,90 +170,218 @@ onMounted(() => {
   padding: 2rem;
   max-width: 1200px;
   margin: 0 auto;
+  background: linear-gradient(-45deg, #fff3e0, #ffe0b2, #ffecb3, #fff8e1);
+  background-size: 400% 400%;
+  animation: gradientBG 15s ease infinite;
+  min-height: 100vh;
+}
+
+@keyframes gradientBG {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 .cart-header {
   margin-bottom: 2rem;
+  padding: 1rem;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .cart-header h1 {
-  font-size: 2rem;
-  color: var(--primary-color);
+  font-size: 1.75rem;
+  color: #2c3e50;
+  margin: 0;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .cart-container {
-  background: lightgray;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  padding: 1.5rem;
+  margin-top: 1rem;
 }
 
 .empty-cart {
   text-align: center;
-  padding: 3rem;
+  padding: 3rem 1.5rem;
+  background: #f8f9fa;
+  border-radius: 8px;
 }
 
 .empty-cart i {
-  font-size: 4rem;
-  color: #ccc;
-  margin-bottom: 1rem;
+  font-size: 3.5rem;
+  color: #95a5a6;
+  margin-bottom: 1.5rem;
+}
+
+.empty-cart p {
+  color: #2c3e50;
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
 }
 
 .continue-shopping {
   display: inline-block;
-  padding: 0.75rem 1.5rem;
-  background-color: var(--primary-color);
+  padding: 0.75rem 2rem;
+  background-color: #3498db;
   color: white;
   text-decoration: none;
-  border-radius: 4px;
-  margin-top: 1rem;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  border: none;
+}
+
+.continue-shopping:hover {
+  background-color: #2980b9;
+  transform: translateY(-2px);
 }
 
 .loading {
   text-align: center;
   padding: 2rem;
-  color: #666;
+  color: #7f8c8d;
+  font-size: 1.1rem;
 }
 
 .loading i {
-  margin-right: 0.5rem;
+  margin-right: 0.75rem;
+  color: #3498db;
 }
 
-
-@media (max-width: 768px) {
-  .cart-view {
-    padding: 1rem;
-  }
-  .cart-summary-container {
-    position: sticky;
-    bottom: 0;
-    background: white;
-    padding: 1rem;
-    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
-  }
+.cart-summary-container {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-radius: 8px;
 }
+
+/* 按鈕樣式 */
 .btn {
-  padding: 0.5rem 1rem;
-  font-size: 0.813rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.95rem;
+  border: none;
+  border-radius: 6px;
+  background: #3498db;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
+
+.btn:hover {
+  background: #2980b9;
+  transform: translateY(-2px);
+}
+
+/* 刪除按鈕 */
+.text-gray-600 {
+  padding: 0.75rem 1.5rem;
+  background: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  margin-bottom: 1rem;
+}
+
+.text-gray-600:hover {
+  background: #c0392b;
+  transform: translateY(-2px);
+}
+
+/* 移除按鈕特製樣式 */
+.remove-btn,
+button[aria-label="移除商品"] {
+  padding: 0.5rem 1rem;
+  background: #ff4757;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  min-width: 80px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.remove-btn:hover,
+button[aria-label="移除商品"]:hover {
+  background: #ff6b81;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(255, 71, 87, 0.2);
+}
+
+.remove-btn i,
+button[aria-label="移除商品"] i {
+  margin-right: 0.4rem;
+  font-size: 0.9rem;
+}
+
 .back-link {
-   margin-bottom: 1rem;
- }
+  margin-bottom: 1.5rem;
+}
 
 .back-link a {
   display: inline-flex;
   align-items: center;
-  color: #666;
+  color: #34495e;
+  font-size: 1rem;
   cursor: pointer;
   text-decoration: none;
-  transition: color 0.3s ease;
+  padding: 0.5rem 1rem;
+  background: #f8f9fa;
+  border-radius: 6px;
+  transition: all 0.3s ease;
 }
 
 .back-link a:hover {
-  color: #4299e1;
+  background: #e9ecef;
+  color: #2c3e50;
 }
 
 .back-link i {
   margin-right: 0.5rem;
 }
 
+@media (max-width: 768px) {
+  .cart-view {
+    padding: 1rem;
+  }
+
+  .cart-summary-container {
+    position: sticky;
+    bottom: 0;
+    background: white;
+    padding: 1rem;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+    border-radius: 12px 12px 0 0;
+    margin-top: 1rem;
+  }
+
+  .btn {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+
+  .cart-header h1 {
+    font-size: 1.5rem;
+  }
+}
 </style>
