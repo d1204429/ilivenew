@@ -84,11 +84,13 @@ const isDataReady = computed(() => {
 })
 
 const orderStatusMap = {
-  1: '待付款',
+  1: '下單鎖定',
   2: '已付款',
   3: '已出貨',
-  4: '已完成',
-  5: '已取消'
+  4: '已取消',
+  5: '已完成',
+  6: '已退貨',
+  7: '未付款取消'
 }
 
 const handleBack = () => {
