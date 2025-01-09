@@ -262,8 +262,8 @@ const formatPrice = (price) => {
 const processPayment = async () => {
     try {
     loading.value = true
-    //console.log(store.state.accessToken)
-    const data = await createOrder(buyerInfo.value.address , store.state.accessToken)
+    //console.log(localStorage.getItem('accessToken'))
+    const data = await createOrder(buyerInfo.value.address , localStorage.getItem('accessToken'))
     orderId.value = data.data.orderId
     console.log(orderId.value)
   } catch (error) {
@@ -276,8 +276,8 @@ const processPayment = async () => {
 const creditPayment = async () => {
     try {
     loading.value = true
-    //console.log(store.state.accessToken)
-    const data = await orderCreditPayment(orderId.value, cardInfo.value.number , store.state.accessToken)
+    //console.log(localStorage.getItem('accessToken'))
+    const data = await orderCreditPayment(orderId.value, cardInfo.value.number , localStorage.getItem('accessToken'))
   } catch (error) {
     console.error('信用卡付款失敗:', error)
   } finally {
@@ -288,8 +288,8 @@ const creditPayment = async () => {
 const applePayment = async () => {
     try {
     loading.value = true
-    //console.log(store.state.accessToken)
-    const data = await orderApplePayPayment(orderId.value, store.state.accessToken)
+    //console.log(localStorage.getItem('accessToken'))
+    const data = await orderApplePayPayment(orderId.value, localStorage.getItem('accessToken'))
   } catch (error) {
     console.error('信用卡付款失敗:', error)
   } finally {
@@ -322,7 +322,7 @@ const getImageUrl = (imagePath) => {
 //使用者資料擷取
 const fetchUserData = async () => {
   try {
-    const data = await getUser(store.state.userId, store.state.accessToken)
+    const data = await getUser(localStorage.getItem('userId'), localStorage.getItem('accessToken'))
     userData.value = data
     buyerInfo.value.name = data.fullName
     buyerInfo.value.phone = data.phoneNumber
@@ -336,8 +336,8 @@ const fetchUserData = async () => {
 // 獲取購物車商品
 const fetchCartItems = async () => {
   try {
-    //console.log(store.state.accessToken)
-    const data = await getCartItems(store.state.accessToken)
+    //console.log(localStorage.getItem('accessToken'))
+    const data = await getCartItems(localStorage.getItem('accessToken'))
     cartItems.value = data
     
   } catch (error) {

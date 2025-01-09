@@ -82,12 +82,12 @@ const isDataReady = computed(() => {
 // 獲取購物車商品
 const fetchCartItems = async () => {
   try {
-    if(!store.state.accessToken){
+    if(!localStorage.getItem('accessToken')){
       router.push('/login')
     }
     loading.value = true
-    //console.log(store.state.accessToken)
-    const data = await getCartItems(store.state.accessToken)
+    //console.log(localStorage.getItem('accessToken'))
+    const data = await getCartItems(localStorage.getItem('accessToken'))
     cartItems.value = data
     
   } catch (error) {
@@ -120,7 +120,7 @@ const removeItem = (cartItemId) => {
 };
 
 const deleteCartItemQty = async (cartItemId) =>{
-  const response = await delCartItem(cartItemId, store.state.accessToken)
+  const response = await delCartItem(cartItemId, localStorage.getItem('accessToken'))
   if (!response) {
         alert(error.message || '刪除購物車項目失敗')
       }else{
@@ -134,7 +134,7 @@ const deleteCart = ()=>{
 }
 
 const clearCartItem = async (cartId) =>{
-  const response = await clearCart(cartId, store.state.accessToken)
+  const response = await clearCart(cartId, localStorage.getItem('accessToken'))
   if (!response) {
         alert(error.message || '刪除購物車失敗')
       }else{

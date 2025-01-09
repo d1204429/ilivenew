@@ -4,27 +4,19 @@ import {searchProduct} from '@/services/products'
 const storeOptions = {
     //狀態資料
     state:{
-        accessToken : "",
-        refreshToken : "",
-        userId : "",
-        userName : "",
+        isLogIn : false,
+        currentUserName: "",
         searchResults: [],
         isSearching: false,
         isTypeSearch:false
     },
     //更新器
     mutations:{
-        updateAccessToken(state, payload){
-            state.accessToken = payload
+        updateIsLogIn(state, payload){
+            state.isLogIn = payload
         },
-        updateRefreshToken(state, payload){
-            state.refreshToken = payload
-        },
-        updateUserId(state, payload){
-            state.userId = payload
-        },
-        updateUserName(state, payload){
-            state.userName = payload
+        updateCurrentUserName(state, payload){
+            state.currentUserName = payload
         },
         setSearchResult(state, results) {
             state.searchResults = results
@@ -41,10 +33,15 @@ const storeOptions = {
         async loginUser({commit}, response) {
             try {
                 if (response?.accessToken) {
-                    commit('updateAccessToken', response.accessToken)
-                    commit('updateRefreshToken', response.refreshToken)
-                    commit('updateUserId', response.user.userId)
-                    commit('updateUserName', response.user.username)
+                    localStorage.setItem('accessToken', response.accessToken);
+                    localStorage.setItem('refreshToken', response.refreshToken);
+                    localStorage.setItem('userId', response.user.userId);
+                    localStorage.setItem('userName', response.user.username);
+                    commit('updateIsLogIn', true)
+                    commit('updateCurrentUserName', response.user.username)
+                    commit('setSearchResult', [])
+                    commit('setIsSearching', false)
+                    commit('setIsTypeSearch', false)
                     return
                 }
                 throw new Error('Login failed: No access token received')
@@ -66,13 +63,19 @@ const storeOptions = {
             }
         },
         async logout({commit}){
-            commit('updateAccessToken', "")
-            commit('updateRefreshToken', "")
-            commit('updateUserId', "")
-            commit('updateUserName', "")
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            localStorage.removeItem('userId');
+            localStorage.removeItem('userName');
+            commit('updateIsLogIn', false)
+            commit('updateCurrentUserName', "")
             commit('setSearchResult', [])
             commit('setIsSearching', false)
             commit('setIsTypeSearch', false)
+        },
+        async getLoginState({commit}){
+            commit('updateIsLogIn', !!localStorage.getItem('accessToken'))
+            commit('updateCurrentUserName', localStorage.getItem('userName'))
         }
     },
 }

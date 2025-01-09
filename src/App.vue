@@ -20,6 +20,8 @@ import { ref, onMounted, onUnmounted } from 'vue'
 // import { useRouter } from 'vue-router'
 import TheHeader from '@/components/layout/TheHeader.vue'
 import TheFooter from '@/components/layout/TheFooter.vue'
+import { useStore } from 'vuex'
+const store = useStore()
 
 //const router = useRouter()
     const isMobile = ref(false)
@@ -35,7 +37,8 @@ import TheFooter from '@/components/layout/TheFooter.vue'
       })
     }
 
-    onMounted(() => {
+    onMounted(async () => {
+      await store.dispatch('getLoginState')
       handleResize()
       window.addEventListener('resize', handleResize)
       //router.afterEach(handleRouteChange)

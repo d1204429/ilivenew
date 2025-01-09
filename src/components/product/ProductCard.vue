@@ -172,11 +172,11 @@ const router = useRouter()
       if (!canAddToCart.value) return
       addingToCart.value = true
       try{
-        if (!store.state.accessToken) {
+        if (!localStorage.getItem('accessToken')) {
           router.push('/login')
           return
         }
-        const response = await addCart(props.product.productId, 1, store.state.accessToken)
+        const response = await addCart(props.product.productId, 1, localStorage.getItem('accessToken'))
         if (response) {
           alert('已加入購物車')
         } else {

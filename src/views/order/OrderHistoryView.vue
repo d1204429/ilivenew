@@ -113,7 +113,7 @@ onMounted(async () => {
 // 獲取訂單數據
 const fetchOrders = async () => {
   try {
-    const response = await getOrder(store.state.accessToken)
+    const response = await getOrder(localStorage.getItem('accessToken'))
     orders.value = response
   } catch (error) {
     console.error('獲取訂單失敗:', error)

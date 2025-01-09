@@ -120,7 +120,7 @@ const formatDate = (dateString) => {
 const fetchOrderDetail = async () => {
     try {
         const id = route.params.id
-        const response = await getOrderDetail(id, store.state.accessToken)
+        const response = await getOrderDetail(id, localStorage.getItem('accessToken'))
         order.value = response
     } catch (error) {
         console.error('獲取訂單詳細資訊失敗:', error)
@@ -130,7 +130,7 @@ const fetchOrderDetail = async () => {
 //使用者資料擷取
 const fetchUserData = async () => {
   try {
-    const data = await getUser(store.state.userId, store.state.accessToken)
+    const data = await getUser(localStorage.getItem('userId'), localStorage.getItem('accessToken'))
     userData.value = data
   } catch (error) {
     console.error('獲取使用者資料失敗:', error)

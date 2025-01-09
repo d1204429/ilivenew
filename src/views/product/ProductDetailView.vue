@@ -158,11 +158,11 @@ const getImageUrl = (imagePath) => {
     }
 
     const addToCart = async () => {
-      if (!store.state.accessToken) {
+      if (!localStorage.getItem('accessToken')) {
         router.push('/login')
         return
       }
-      const response = await addCart(route.params.id, quantity.value, store.state.accessToken)
+      const response = await addCart(route.params.id, quantity.value, localStorage.getItem('accessToken'))
       if (response) {
         alert('已加入購物車')
       } else {

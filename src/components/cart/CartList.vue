@@ -81,7 +81,7 @@ const updateQuantity=(index, qty) => {
 }
 
 const putCartItemQty = async (index ,cartItemId, productId, quantity) => {
-      const response = await putCartQty(cartItemId, productId, quantity, store.state.accessToken)
+      const response = await putCartQty(cartItemId, productId, quantity, localStorage.getItem('accessToken'))
       if (!response) {
         alert(error.message || '更新購物車數量失敗')
       }else{

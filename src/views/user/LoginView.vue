@@ -270,7 +270,7 @@ const validateField = (fieldName) => {
 
         const response = await login(formData.username.trim(),formData.password)
         await store.dispatch('loginUser', response)
-        //console.log(store.state.accessToken)
+        //console.log(localStorage.getItem('accessToken'))
 
         // Handle Remember Me
         if (formData.rememberMe) {

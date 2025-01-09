@@ -133,7 +133,7 @@ const handleBack = () => {
   }
 }
     // Computed Properties
-    const isAuthenticated = computed(() => !!store.state.accessToken)
+    const isAuthenticated = computed(() => !!localStorage.getItem('accessToken'))
 
     const isFormValid = computed(() => {
       return !Object.keys(errors.value).length &&
@@ -209,13 +209,13 @@ const handleBack = () => {
         loading.value = true
         globalError.value = ''
 
-        const response = await putUser(store.state.userId, 
+        const response = await putUser(localStorage.getItem('userId'), 
         editedProfile.value.username,
         editedProfile.value.email,
         editedProfile.value.fullName,
         editedProfile.value.phoneNumber,
         editedProfile.value.address,
-        store.state.accessToken)
+        localStorage.getItem('accessToken'))
         if (response) {
           isEditing.value = false
           await fetchUserData()
@@ -231,7 +231,7 @@ const handleBack = () => {
 const fetchUserData = async () => {
   try {
     loading.value = true
-    const data = await getUser(store.state.userId, store.state.accessToken)
+    const data = await getUser(localStorage.getItem('userId'), localStorage.getItem('accessToken'))
     currentUser.value = data
   } catch (error) {
     console.error('獲取使用者資料失敗:', error)

@@ -85,11 +85,11 @@
 
       <!-- 用戶操作區 -->
       <nav class="user-nav">
-        <template v-if="isLoggedIn">
+        <template v-if="store.state.isLogIn">
           <div class="user-info">
             <router-link to="/profile" class="nav-link">
               <i class="fas fa-user"></i>
-              <span class="username">{{ currentUserName }}</span>
+              <span class="username">{{ store.state.currentUserName }}</span>
             </router-link>
             <div class="user-dropdown">
               <router-link to="/profile" class="dropdown-item">個人資料</router-link>
@@ -140,9 +140,6 @@ const categories = ref([
 const isInitialized = ref(false)
 
 // Computed Properties
-const isLoggedIn = computed(() => !!store.state.accessToken)
-const currentUserName = computed(() => store.state.userName) 
-
 watch(searchKeyword, async (newValue) => 
 {
   const trimmedKeyword = newValue.trim()
@@ -184,7 +181,6 @@ const handleLogout= async() =>{
   await store.dispatch('logout')
   router.push('/login')
 }
-
 onMounted(() => {
   window.addEventListener('resize', handleResize)
 })
