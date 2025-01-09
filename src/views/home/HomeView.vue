@@ -6,10 +6,10 @@
         <i class="fas fa-chevron-left"></i>
       </button>
       <div class="carousel-inner2" :style="{ transform: `translateX(-${currentSlide * 100}%)` }">
-        <div v-for="(slide, index) in carouselSlides"
+        <div v-for="(slide, index) in processedSlides"
              :key="index"
              class="carousel-slide"
-             :class="{ 'cursor-pointer': slide.link }"
+             :class="{ 'cursor-pointer': slide.isClickable }"
              @click="handleSlideClick(slide)">
           <img :src="slide.image" :alt="slide.caption">
           <div class="carousel-caption">{{ slide.caption }}</div>
@@ -87,7 +87,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { getPromotions } from '@/services/promotion'
 import { getPromotionProduct, getProductInfo } from '@/services/products'
 import { useRouter } from 'vue-router'
@@ -95,19 +95,21 @@ import { useStore } from 'vuex'
 import ProductCard from '@/components/product/ProductCard.vue'
 import PromotionProductCarousel from '@/components/carousel/PromotionProductCarousel.vue'
 
-//const router = useRouter()
 const store = useStore()
 const isSearching = computed(() => store.state.isSearching)
 const searchResults = computed(() => store.state.searchResults)
-const isTypeSearch = computed(()=> store.state.isTypeSearch)
+const isTypeSearch = computed(() => store.state.isTypeSearch)
 const router = useRouter()
+
+// 判斷是否已登入
+const isLoggedIn = computed(() => !!store.state.accessToken)
 
 //初始get promotionData
 onMounted(() => {
   getPromotionsData()
 })
 
-// 輪播圖相關
+// 輪播圖基礎數據
 const currentSlide = ref(0)
 const carouselSlides = ref([
   {
@@ -123,13 +125,20 @@ const carouselSlides = ref([
   {
     image: '/src/assets/carousel/login.webp',
     caption: '立即登入',
-    link: '/login'  // 添加登入頁面路由
+    link: '/login'
   }
 ])
 
-// 處理輪播圖點擊
+// 處理輪播圖點擊邏輯
+const processedSlides = computed(() => {
+  return carouselSlides.value.map(slide => ({
+    ...slide,
+    isClickable: slide.link === '/login' ? !isLoggedIn.value : !!slide.link
+  }))
+})
+
 const handleSlideClick = (slide) => {
-  if (slide.link) {
+  if (slide.isClickable && slide.link) {
     router.push(slide.link)
   }
 }
