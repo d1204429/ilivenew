@@ -19,25 +19,33 @@
       </div>
 
       <form class="register-form" @submit.prevent="handleRegister">
-        <!-- Form fields remain the same -->
         <div class="form-group" v-for="field in formFields" :key="field.id">
           <label :for="field.id">{{ field.label }}</label>
           <BaseInput
               :id="field.id"
               v-model="formData[field.id]"
-              :type="field.type || 'text'"
+              :type="showPassword[field.id] ? 'text' : field.type || 'text'"
               :placeholder="field.placeholder"
               :error="validationErrors[field.id]"
               @blur="validateField(field.id)"
           >
-            <template #append v-if="field.id === 'password' || field.id === 'confirmPassword'">
+            <template v-if="field.id === 'password' || field.id === 'confirmPassword'" #append>
               <i
                   class="password-toggle"
-                  :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"
-                  @click="togglePasswordVisibility"
+                  :class="showPassword[field.id] ? 'fas fa-eye-slash' : 'fas fa-eye'"
+                  @click="() => togglePasswordVisibility(field.id)"
               ></i>
             </template>
           </BaseInput>
+          <div v-if="field.id === 'password'" class="password-strength">
+            <div class="strength-bar">
+              <div
+                  :style="{ width: `${passwordStrength}%` }"
+                  :class="getStrengthClass(passwordStrength)"
+              ></div>
+            </div>
+            <span>密碼強度: {{ getStrengthText(passwordStrength) }}</span>
+          </div>
         </div>
 
         <BaseButton
@@ -59,30 +67,156 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { useStore } from 'vuex'
 import BaseInput from '@/components/common/BaseInput.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
+import * as validators from '@/utils/validators'
+import { register } from '@/services/users'
 
 const router = useRouter()
-    const store = useStore()
-    const isLoading = ref(false)
-    const showPassword = ref(false)
-    const globalError = ref('')
-    const countdown = ref(5)
-    const successMessage = ref('')
-    const validationErrors = reactive({})
+const isLoading = ref(false)
+const showPassword = reactive({
+  password: false,
+  confirmPassword: false
+})
+const globalError = ref('')
+const countdown = ref(5)
+const successMessage = ref('')
+const validationErrors = reactive({})
+const passwordStrength = ref(0)
 
-    const formFields = [
-      { id: 'username', label: '用戶名', placeholder: '請輸入用戶名' },
-      { id: 'email', label: '電子郵件', type: 'email', placeholder: '請輸入電子郵件' },
-      { id: 'fullName', label: '全名', placeholder: '請輸入全名' },
-      { id: 'phoneNumber', label: '手機號碼', type: 'tel', placeholder: '請輸入手機號碼' },
-      { id: 'address', label: '地址', placeholder: '請輸入地址' },
-      { id: 'password', label: '密碼', type: 'password', placeholder: '請輸入密碼' },
-      { id: 'confirmPassword', label: '確認密碼', type: 'password', placeholder: '請再次輸入密碼' }
-    ]
+const formFields = [
+  { id: 'username', label: '用戶名', placeholder: '請輸入用戶名' },
+  { id: 'email', label: '電子郵件', type: 'email', placeholder: '請輸入電子郵件' },
+  { id: 'fullName', label: '全名', placeholder: '請輸入全名' },
+  { id: 'phoneNumber', label: '手機號碼', type: 'tel', placeholder: '請輸入手機號碼' },
+  { id: 'address', label: '地址', placeholder: '請輸入地址' },
+  { id: 'password', label: '密碼', type: 'password', placeholder: '請輸入密碼' },
+  { id: 'confirmPassword', label: '確認密碼', type: 'password', placeholder: '請再次輸入密碼' }
+]
+
+const formData = reactive({
+  username: '',
+  email: '',
+  fullName: '',
+  phoneNumber: '',
+  address: '',
+  password: '',
+  confirmPassword: ''
+})
+
+// 監聽密碼變化，更新密碼強度
+watch(() => formData.password, (newValue) => {
+  passwordStrength.value = validators.calculatePasswordStrength(newValue)
+})
+
+const validateField = (fieldName) => {
+  const value = formData[fieldName]
+  let result
+
+  switch (fieldName) {
+    case 'username':
+      result = validators.username(value)
+      break
+    case 'email':
+      result = validators.email(value)
+      break
+    case 'fullName':
+      result = validators.fullName(value)
+      break
+    case 'phoneNumber':
+      result = validators.phoneNumber(value)
+      break
+    case 'address':
+      result = validators.address(value)
+      break
+    case 'password':
+      result = validators.password(value)
+      break
+    case 'confirmPassword':
+      result = validators.confirmPassword(formData.password)(value)
+      break
+    default:
+      result = true
+  }
+
+  if (result === true) {
+    delete validationErrors[fieldName]
+  } else {
+    validationErrors[fieldName] = result
+  }
+
+  return result === true
+}
+
+const validateForm = () => {
+  let isValid = true
+  formFields.forEach(field => {
+    if (!validateField(field.id)) {
+      isValid = false
+    }
+  })
+  return isValid
+}
+
+const isFormValid = computed(() => {
+  return Object.keys(formData).every(field => !!formData[field]) &&
+      Object.keys(validationErrors).length === 0
+})
+
+const togglePasswordVisibility = (fieldId) => {
+  showPassword[fieldId] = !showPassword[fieldId]
+}
+
+const getStrengthClass = (strength) => {
+  if (strength < 40) return 'weak'
+  if (strength < 70) return 'medium'
+  return 'strong'
+}
+
+const getStrengthText = (strength) => {
+  if (strength < 40) return '弱'
+  if (strength < 70) return '中'
+  return '強'
+}
+
+const startCountdown = () => {
+  successMessage.value = `註冊成功！${countdown.value}秒後自動跳轉到登入頁面...`
+  const timer = setInterval(() => {
+    countdown.value--
+    successMessage.value = `註冊成功！${countdown.value}秒後自動跳轉到登入頁面...`
+    if (countdown.value <= 0) {
+      clearInterval(timer)
+      router.push('/login')
+    }
+  }, 1000)
+}
+
+const handleRegistrationError = (error) => {
+  const errorMessage = error.response?.data?.message || error.message
+  console.error('註冊失敗:', error)
+
+  const errorMap = {
+    'username': '此用戶名已被使用',
+    'email': '此電子郵件已被註冊',
+    'phoneNumber': '此手機號碼已被註冊'
+  }
+
+  let foundSpecificError = false
+  for (const [field, message] of Object.entries(errorMap)) {
+    if (errorMessage.toLowerCase().includes(field.toLowerCase())) {
+      validationErrors[field] = message
+      foundSpecificError = true
+      break
+    }
+  }
+
+  if (!foundSpecificError) {
+    globalError.value = errorMessage || '註冊失敗，請稍後再試'
+  }
+}
+
 const handleBack = () => {
   if (window.history.length > 2) {
     router.go(-1)
@@ -91,150 +225,31 @@ const handleBack = () => {
   }
 }
 
-    const formData = reactive({
-      username: '',
-      email: '',
-      fullName: '',
-      phoneNumber: '',
-      address: '',
-      password: '',
-      confirmPassword: ''
-    })
+const handleRegister = async () => {
+  if (!validateForm()) return
 
-    const validationRules = {
-      username: [
-        v => !!v || '請輸入用戶名',
-        v => v.length >= 3 || '用戶名至少需要3個字元',
-        v => v.length <= 20 || '用戶名不能超過20個字元',
-        v => /^[a-zA-Z0-9_]+$/.test(v) || '用戶名只能包含字母、數字和底線',
-        v => !/^\d+$/.test(v) || '用戶名不能全為數字'
-      ],
-      email: [
-        v => !!v || '請輸入電子郵件',
-        v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || '請輸入有效的電子郵件',
-        v => v.length <= 50 || '電子郵件長度不能超過50個字元'
-      ],
-      fullName: [
-        v => !!v || '請輸入全名',
-        v => v.length >= 2 || '全名至少需要2個字元',
-        v => v.length <= 50 || '全名不能超過50個字元',
-        v => /^[\u4e00-\u9fa5a-zA-Z\s]+$/.test(v) || '全名只能包含中文、英文和空格'
-      ],
-      phoneNumber: [
-        v => !!v || '請輸入手機號碼',
-        v => /^09\d{8}$/.test(v) || '請輸入有效的台灣手機號碼'
-      ],
-      address: [
-        v => !!v || '請輸入地址',
-        v => v.length >= 5 || '地址至少需要5個字元',
-        v => v.length <= 100 || '地址不能超過100個字元'
-      ],
-      password: [
-        v => !!v || '請輸入密碼',
-        v => v.length >= 8 || '密碼長度至少需要8個字元',
-        v => v.length <= 20 || '密碼長度不能超過20個字元',
-        v => /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,}$/.test(v) ||
-            '密碼必須包含大小寫字母、數字和特殊符號'
-      ],
-      confirmPassword: [
-        v => !!v || '請確認密碼',
-        v => v === formData.password || '兩次輸入的密碼不一致'
-      ]
+  try {
+    isLoading.value = true
+    globalError.value = ''
+
+    const userData = {
+      username: formData.username.trim(),
+      password: formData.password,
+      email: formData.email.trim(),
+      fullName: formData.fullName.trim(),
+      phoneNumber: formData.phoneNumber.trim(),
+      address: formData.address.trim()
     }
 
-    const validateField = (fieldName) => {
-      const rules = validationRules[fieldName]
-      const value = formData[fieldName]
+    await register(userData)
+    startCountdown()
 
-      for (const rule of rules) {
-        const result = rule(value)
-        if (result !== true) {
-          validationErrors[fieldName] = result
-          return false
-        }
-      }
-
-      delete validationErrors[fieldName]
-      return true
-    }
-
-    const validateForm = () => {
-      let isValid = true
-      Object.keys(validationRules).forEach(field => {
-        if (!validateField(field)) {
-          isValid = false
-        }
-      })
-      return isValid
-    }
-
-    const isFormValid = computed(() => {
-      return Object.keys(formData).every(field => !!formData[field]) &&
-          Object.keys(validationErrors).length === 0
-    })
-
-    const togglePasswordVisibility = () => {
-      showPassword.value = !showPassword.value
-    }
-
-    const startCountdown = () => {
-      successMessage.value = `註冊成功！${countdown.value}秒後自動跳轉到登入頁面...`
-      const timer = setInterval(() => {
-        countdown.value--
-        successMessage.value = `註冊成功！${countdown.value}秒後自動跳轉到登入頁面...`
-        if (countdown.value <= 0) {
-          clearInterval(timer)
-          router.push('/login')
-        }
-      }, 1000)
-    }
-
-    const handleRegistrationError = (error) => {
-      const errorMessage = error.response?.data?.message || error.message
-      console.error('註冊失敗:', error)
-
-      const errorMap = {
-        'username': '此用戶名已被使用',
-        'email': '此電子郵件已被註冊',
-        'phoneNumber': '此手機號碼已被註冊'
-      }
-
-      for (const [field, message] of Object.entries(errorMap)) {
-        if (errorMessage.includes(field)) {
-          validationErrors[field] = message
-          return
-        }
-      }
-
-      globalError.value = errorMessage || '註冊失敗，請稍後再試'
-    }
-
-    const handleRegister = async () => {
-      if (!validateForm()) return
-
-    //   try {
-    //     isLoading.value = true
-    //     globalError.value = ''
-
-    //     const userData = {
-    //       username: formData.username.trim(),
-    //       password: formData.password,
-    //       email: formData.email.trim(),
-    //       fullName: formData.fullName.trim(),
-    //       phoneNumber: formData.phoneNumber.trim(),
-    //       address: formData.address.trim()
-    //     }
-
-    //     await store.dispatch('auth/register', userData)
-    //     startCountdown()
-
-    //   } catch (error) {
-    //     handleRegistrationError(error)
-    //   } finally {
-    //     isLoading.value = false
-    //   }
-    }
-
+  } catch (error) {
+    handleRegistrationError(error)
+  } finally {
+    isLoading.value = false
+  }
+}
 </script>
 
 <style scoped>
@@ -272,6 +287,16 @@ label {
   margin-bottom: 0.5rem;
   color: #2c3e50;
   font-weight: 500;
+}
+
+.password-toggle {
+  cursor: pointer;
+  color: #666;
+  transition: color 0.3s ease;
+}
+
+.password-toggle:hover {
+  color: #4299e1;
 }
 
 .error-message {
@@ -338,22 +363,36 @@ label {
   opacity: 0.9;
 }
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+.password-strength {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
 }
 
-@media (max-width: 640px) {
-  .register-container {
-    margin: 1rem;
-    padding: 1.5rem;
-  }
-
-  .register-title {
-    font-size: 1.5rem;
-  }
+.strength-bar {
+  height: 4px;
+  background-color: #e2e8f0;
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 0.25rem;
 }
+
+.strength-bar > div {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.strength-bar > div.weak {
+  background-color: #f56565;
+}
+
+.strength-bar > div.medium {
+  background-color: #ed8936;
+}
+
+.strength-bar > div.strong {
+  background-color: #48bb78;
+}
+
 .back-link {
   margin-bottom: 1rem;
 }
@@ -375,4 +414,20 @@ label {
   margin-right: 0.5rem;
 }
 
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 640px) {
+  .register-container {
+    margin: 1rem;
+    padding: 1.5rem;
+  }
+
+  .register-title {
+    font-size: 1.5rem;
+  }
+}
 </style>

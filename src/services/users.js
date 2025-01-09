@@ -51,5 +51,16 @@ async function updateUser(userId, userData, bearToken) {
         throw error;
     }
 }
+async function register(userData) {
+    try {
+        const response = await api.post('/users/register', userData);
+        const data = await response.data;
+        console.log('Register response:', data);
+        return data;
+    } catch (error) {
+        console.error('Register error:', error.response || error);
+        throw error;
+    }
+}
 
-export {login, getUser, updateUser}
+export {login, getUser, updateUser, register}
