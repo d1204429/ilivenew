@@ -23,7 +23,7 @@
         </div>
         <div class="value-card">
           <i class="fas fa-truck"></i>
-          <h3>全年免運</h3>
+          <h3>全館免運</h3>
           <p>所有商品全年全日免運費，讓您安心購物</p>
         </div>
         <div class="value-card">
