@@ -64,6 +64,15 @@ const storeOptions = {
             } finally {
                 commit('setIsSearching', false)
             }
+        },
+        async logout({commit}){
+            commit('updateAccessToken', "")
+            commit('updateRefreshToken', "")
+            commit('updateUserId', "")
+            commit('updateUserName', "")
+            commit('setSearchResult', [])
+            commit('setIsSearching', false)
+            commit('setIsTypeSearch', false)
         }
     },
 }

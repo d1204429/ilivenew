@@ -165,6 +165,10 @@ const formatDiscount = (type, value) => {
 </script>
 
 <style scoped>
+.cursor-pointer {
+  cursor: pointer;
+}
+
 .home-view {
   padding: 0rem;
   max-width: 1200px;

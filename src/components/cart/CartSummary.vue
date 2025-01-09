@@ -127,7 +127,7 @@ const proceedToCheckout = () => {
 }
 
 const continueShopping = () => {
-  router.push('/products')
+  router.push('/')
 }
 </script>
 

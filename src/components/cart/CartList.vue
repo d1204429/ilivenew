@@ -1,24 +1,14 @@
 <template>
   <div class="cart-list">
-    <div v-for="(item, index) in cartItems" >
-      <div class="cart-row">
-        <!-- 第一欄：圖片 -->
-         <div >
-          <img :src="getImageUrl(prodItems[index].imageUrl)"
+    <div class="product-list">
+      <div v-for="(item, index) in cartItems" class="product-item">
+        <img :src="getImageUrl(prodItems[index].imageUrl)"
           :alt="item.name" >
+        <div class="product-info">
+          <h3>{{ prodItems[index].name }}</h3>
+          <p>${{ getPrice(prodItems[index].promotionalPrice, prodItems[index].originalPrice) }}</p>
         </div>
-        <!-- 第二欄：品名 -->
-         <div >
-          <h5 class="font-bold">{{ prodItems[index].name }}</h5>
-        </div>
-        <!-- 第三欄：價格 -->
-         <div >
-          <div class="text-red-600 text-xl">
-            ${{ getPrice(prodItems[index].promotionalPrice, prodItems[index].originalPrice) }}
-          </div>
-        </div>
-        <!-- 第四欄：數量調整 -->
-         <div >
+        <div >
           <button @click="updateQuantity(index, -1)" 
           class="px-2 py-1 border rounded hover:bg-gray-100"
           :disabled="loading || item.quantity<=1">-</button>
@@ -34,7 +24,7 @@
             移除
           </button>
         </div>
-      </div>
+    </div>
     </div>
   </div>
 </template>
@@ -115,12 +105,62 @@ const removeItem = (index) => {
   display:flex;
 }
 
-img {
+.product-item {
+  display: flex;
+  gap: 1.5rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  transition: transform 0.3s ease;
+}
+
+.product-item:hover {
+  transform: translateY(-2px);
+}
+
+.product-item img {
   width: 100px;
   height: 100px;
   object-fit: cover;
-  border-radius: 4px;
-  transition: transform 0.3s ease;
+  border-radius: 8px;
+}
+
+.product-list {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.product-info {
+  flex: 1;
+}
+
+.product-info h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.1rem;
+  color: #2c3e50;
+  font-weight: 500;
+}
+
+.product-info p {
+  margin: 0.25rem 0;
+  color: #7f8c8d;
+}
+
+/* 刪除按鈕 */
+.text-gray-600 {
+  padding: 0.75rem 1.5rem;
+  background: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  margin-bottom: 1rem;
+}
+
+.text-gray-600:hover {
+  background: #c0392b;
+  transform: translateY(-2px);
 }
 
 </style>

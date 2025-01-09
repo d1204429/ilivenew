@@ -43,7 +43,7 @@
               <router-link
                   v-for="category in categories"
                   :key="category.id"
-                  :to="{ path: '/products', query: { search: category.id } }"
+                  :to="{ name: 'Category', params: { id: category.id } }"
                   class="dropdown-item"
                   @click="toggleMenu"
               >
@@ -73,13 +73,12 @@
             v-model="searchKeyword"
             placeholder="搜尋商品"
             aria-label="搜尋"
+            @keyup.enter="handleSearch"
         >
-        <!-- @keyup.enter="handleSearch" -->
         <button
             @click="handleSearch"
             aria-label="搜尋按鈕"
         >
-        <!-- @click="handleSearch" -->
           <i class="fas fa-search"></i>
         </button>
       </div>
@@ -97,9 +96,9 @@
               <router-link to="/orders" class="dropdown-item">訂單記錄</router-link>
               <button
                   class="dropdown-item"
-                  
+                  @click="handleLogout"
               >登出</button>
-              <!-- @click="handleLogout" -->
+              <!--  -->
             </div>
           </div>
         </template>
@@ -124,10 +123,10 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useStore } from 'vuex'
-// import { useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 
 const store = useStore()
-// const router = useRouter()
+const router = useRouter()
 
 // Reactive State
 const isMenuOpen = ref(false)
@@ -181,13 +180,12 @@ const handleResize = () => {
   }
 }
 
-//const currentUser = computed(() => store.state.userId)
-//console.log(currentUser)
-// const cartItemCount = computed(() => store.getters['cart/itemCount'])
+const handleLogout= async() =>{
+  await store.dispatch('logout')
+  router.push('/login')
+}
 
-// Lifecycle Hooks
-onMounted(async () => {
-  //await initializeHeader()
+onMounted(() => {
   window.addEventListener('resize', handleResize)
 })
 
@@ -195,90 +193,8 @@ onUnmounted(() => {
   window.removeEventListener('resize', handleResize)
   document.body.style.overflow = ''
 })
-
-    // Methods
-    // const fetchCategories = async () => {
-    //   try {
-    //     const response = await store.dispatch('product/getCategories')
-    //     if (response) {
-    //       categories.value = response
-    //     }
-    //   } catch (error) {
-    //     store.dispatch('app/setError', {
-    //       message: '獲取分類失敗，請重新整理頁面',
-    //       type: 'error',
-    //       duration: 3000
-    //     })
-    //   }
-    // }
-
-    // const fetchUserData = async () => {
-    //   try {
-    //     if (isLoggedIn.value && !currentUser.value) {
-    //       await store.dispatch('auth/getProfile')
-    //     }
-    //     if (isLoggedIn.value) {
-    //       await store.dispatch('cart/fetchCartItems')
-    //     }
-    //   } catch (error) {
-    //     if (error.response?.status === 401) {
-    //       await store.dispatch('auth/logout')
-    //       router.push('/login')
-    //     }
-    //     console.error('獲取用戶數據失敗:', error)
-    //   }
-    // }
-
-    // const initializeHeader = async () => {
-    //   if (isInitialized.value) return
-    //   try {
-    //     await fetchCategories()
-    //     await fetchUserData()
-    //     isInitialized.value = true
-    //   } catch (error) {
-    //     console.error('初始化頁面失敗:', error)
-    //     store.dispatch('app/setError', {
-    //       message: '初始化失敗，請重新整理頁面',
-    //       type: 'error',
-    //       duration: 3000
-    //     })
-    //   }
-    // }
-
-    // const handleLogout = async () => {
-    //   try {
-    //     await store.dispatch('auth/logout')
-    //     router.push('/login')
-    //     store.dispatch('app/setSuccess', {
-    //       message: '已成功登出',
-    //       duration: 2000
-    //     })
-    //   } catch (error) {
-    //     store.dispatch('app/setError', {
-    //       message: '登出失敗，請稍後再試',
-    //       type: 'error',
-    //       duration: 3000
-    //     })
-    //   }
-    // }
-
-    
-
-    // Watchers
-    // watch(isLoggedIn, async (newValue, oldValue) => {
-    //   if (newValue && newValue !== oldValue) {
-    //     await fetchUserData()
-    //   } else if (!newValue) {
-    //     store.commit('cart/CLEAR_CART')
-    //   }
-    // })
-
-    // watch(() => router.currentRoute.value.path, () => {
-    //   if (isMenuOpen.value) {
-    //     toggleMenu()
-    //   }
-    // })
 </script>
+
 <style scoped>
 .header {
   background: #fff;

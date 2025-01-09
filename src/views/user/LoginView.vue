@@ -1,6 +1,11 @@
 <template>
   <div class="login-view">
     <div class="login-container">
+      <div class="back-link">
+        <a @click="handleBack">
+          <i class="fas fa-arrow-left"></i> 返回
+        </a>
+      </div>
       <h2>登入 iLive</h2>
 
       <form @submit.prevent="handleSubmit" class="login-form">
@@ -108,10 +113,10 @@
 
         <!-- Additional Options -->
         <div class="additional-options">
-          <router-link to="/forgot-password" class="forgot-password">
+          <!-- <router-link to="/forgot-password" class="forgot-password">
             <i class="fas fa-key"></i>
             忘記密碼？
-          </router-link>
+          </router-link> -->
           <router-link to="/register" class="register">
             <i class="fas fa-user-plus"></i>
             註冊新帳號
@@ -131,69 +136,75 @@ import BaseInput from '@/components/common/BaseInput.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
 
 const router = useRouter()
-    const store = useStore()
+const store = useStore()
 
-    // Reactive State
-    const isLoading = ref(false)
-    const showPassword = ref(false)
-    const globalError = ref('')
-    const successMessage = ref('')
-    const validationErrors = reactive({})
-    const countdown = ref(5)
-    const loginAttempts = ref(0)
-    const maxLoginAttempts = 5
-    const isRedirecting = ref(false)
-    const isLocked = ref(false)
-    let countdownTimer = null
-    let successTimer = null
-    let lockTimer = null
+// Reactive State
+const isLoading = ref(false)
+const showPassword = ref(false)
+const globalError = ref('')
+const successMessage = ref('')
+const validationErrors = reactive({})
+const countdown = ref(5)
+const loginAttempts = ref(0)
+const maxLoginAttempts = 5
+const isRedirecting = ref(false)
+const isLocked = ref(false)
+let countdownTimer = null
+let successTimer = null
+let lockTimer = null
 
-    const formData = reactive({
-      username: '',
-      password: '',
-      rememberMe: false
-    })
+const handleBack = () => {
+  if (window.history.length > 2) {
+    router.go(-1)
+  } else {
+    router.push('/')
+  }
+}
 
-    // Validation Rules
-    const validationRules = {
-      username: [
-        v => !!v || '請輸入帳號',
-        v => v.length >= 3 || '帳號長度至少需要3個字元',
-        v => /^[a-zA-Z0-9_]+$/.test(v) || '帳號只能包含字母、數字和底線'
-      ],
-      password: [
-        v => !!v || '請輸入密碼',
-        v => v.length >= 8 || '密碼長度至少需要8個字元'
-      ]
+const formData = reactive({
+  username: '',
+  password: '',
+  rememberMe: false
+})
+
+// Validation Rules
+const validationRules = {
+  username: [
+    v => !!v || '請輸入帳號',
+    v => v.length >= 3 || '帳號長度至少需要3個字元',
+    v => /^[a-zA-Z0-9_]+$/.test(v) || '帳號只能包含字母、數字和底線'
+  ],
+  password: [
+    v => !!v || '請輸入密碼',
+    v => v.length >= 8 || '密碼長度至少需要8個字元'
+  ]
+}
+
+// Timer Management
+const clearAllTimers = () => {
+  [countdownTimer, successTimer, lockTimer].forEach(timer => {
+    if (timer) {
+      clearInterval(timer)
+      clearTimeout(timer)
     }
+  })
+  countdownTimer = successTimer = lockTimer = null
+}
 
-    // Timer Management
-    const clearAllTimers = () => {
-      [countdownTimer, successTimer, lockTimer].forEach(timer => {
-        if (timer) {
-          clearInterval(timer)
-          clearTimeout(timer)
-        }
-      })
-      countdownTimer = successTimer = lockTimer = null
+// Form Validation
+const validateField = (fieldName) => {
+  const rules = validationRules[fieldName]
+  const value = formData[fieldName]
+  for (const rule of rules) {
+    const result = rule(value)
+    if (result !== true) {
+      validationErrors[fieldName] = result
+      return false
     }
-
-    // Form Validation
-    const validateField = (fieldName) => {
-      const rules = validationRules[fieldName]
-      const value = formData[fieldName]
-
-      for (const rule of rules) {
-        const result = rule(value)
-        if (result !== true) {
-          validationErrors[fieldName] = result
-          return false
-        }
-      }
-
-      delete validationErrors[fieldName]
-      return true
-    }
+  }
+  delete validationErrors[fieldName]
+  return true
+}
 
     const validateForm = () => {
       return Object.keys(validationRules).every(validateField)
@@ -529,4 +540,30 @@ h2 {
     transform: translateY(0);
   }
 }
+
+.btn {
+  padding: 0.5rem 1rem;
+  font-size: 0.813rem;
+}
+.back-link {
+   margin-bottom: 1rem;
+ }
+
+.back-link a {
+  display: inline-flex;
+  align-items: center;
+  color: #666;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.back-link a:hover {
+  color: #4299e1;
+}
+
+.back-link i {
+  margin-right: 0.5rem;
+}
+
 </style>

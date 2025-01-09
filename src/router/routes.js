@@ -8,25 +8,25 @@ export default [
             keepAlive: true
         }
     },
-    {
-        path: '/products',
-        name: 'Products',
-        component: () => import('@/views/product/ProductListView.vue'),
-        meta: {
-            title: '商品列表',
-            keepAlive: true
-        }
-    },
     // {
-    //     path: '/category/:id',
-    //     name: 'Category',
+    //     path: '/products',
+    //     name: 'Products',
     //     component: () => import('@/views/product/ProductListView.vue'),
-    //     props: route => ({ categoryId: parseInt(route.params.id) }),
     //     meta: {
-    //         title: '商品分類',
+    //         title: '商品列表',
     //         keepAlive: true
     //     }
     // },
+    {
+        path: '/category/:id',
+        name: 'Category',
+        component: () => import('@/views/product/ProductListView.vue'),
+        props: route => ({ categoryId: parseInt(route.params.id) }),
+        meta: {
+            title: '商品分類',
+            keepAlive: true
+        }
+    },
     {
         path: '/product/:id',
         name: 'ProductDetail',

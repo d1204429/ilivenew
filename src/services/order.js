@@ -37,11 +37,11 @@ async function orderCreditPayment(orderId, cardNumber, bearToken){
   return data;
 }
 
-async function orderApplePayPayment(orderId, applePayToken, bearToken){
+async function orderApplePayPayment(orderId, bearToken){
     const response = await api.post(`/orders/${orderId}/payment`,
         {
             paymentMethod : "APPLE_PAY",
-            applePayToken: applePayToken
+            applePayToken: "applePayToken"
         },
         {
             headers: {

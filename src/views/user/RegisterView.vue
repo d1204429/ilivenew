@@ -1,6 +1,11 @@
 <template>
   <div class="register-view">
     <div class="register-container">
+      <div class="back-link">
+        <a @click="handleBack">
+          <i class="fas fa-arrow-left"></i> 返回
+        </a>
+      </div>
       <h2 class="register-title">會員註冊</h2>
 
       <div v-if="globalError" class="error-message">
@@ -58,6 +63,7 @@ import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import BaseInput from '@/components/common/BaseInput.vue'
 import BaseButton from '@/components/common/BaseButton.vue'
+import {register} from '@/services/users'
 
 const router = useRouter()
     const store = useStore()
@@ -177,49 +183,57 @@ const router = useRouter()
     }
 
     const handleRegistrationError = (error) => {
-      const errorMessage = error.response?.data?.message || error.message
-      console.error('註冊失敗:', error)
+      // const errorMessage = error.response?.data?.message || error.message
+      // console.error('註冊失敗:', error)
 
-      const errorMap = {
-        'username': '此用戶名已被使用',
-        'email': '此電子郵件已被註冊',
-        'phoneNumber': '此手機號碼已被註冊'
+      // const errorMap = {
+      //   'username': '此用戶名已被使用',
+      //   'email': '此電子郵件已被註冊',
+      //   'phoneNumber': '此手機號碼已被註冊'
+      // }
+
+      // for (const [field, message] of Object.entries(errorMap)) {
+      //   if (errorMessage.includes(field)) {
+      //     validationErrors[field] = message
+      //     return
+      //   }
+      // }
+
+      globalError.value = '註冊失敗，請稍後再試'
+    }
+
+    const handleBack = () => {
+      if (window.history.length > 2) {
+        router.go(-1)
+      } else {
+        router.push('/')
       }
-
-      for (const [field, message] of Object.entries(errorMap)) {
-        if (errorMessage.includes(field)) {
-          validationErrors[field] = message
-          return
-        }
-      }
-
-      globalError.value = errorMessage || '註冊失敗，請稍後再試'
     }
 
     const handleRegister = async () => {
       if (!validateForm()) return
 
-    //   try {
-    //     isLoading.value = true
-    //     globalError.value = ''
+      try {
+        isLoading.value = true
+        globalError.value = ''
 
-    //     const userData = {
-    //       username: formData.username.trim(),
-    //       password: formData.password,
-    //       email: formData.email.trim(),
-    //       fullName: formData.fullName.trim(),
-    //       phoneNumber: formData.phoneNumber.trim(),
-    //       address: formData.address.trim()
-    //     }
+        const userData = {
+          username: formData.username.trim(),
+          password: formData.password,
+          email: formData.email.trim(),
+          fullName: formData.fullName.trim(),
+          phoneNumber: formData.phoneNumber.trim(),
+          address: formData.address.trim()
+        }
 
-    //     await store.dispatch('auth/register', userData)
-    //     startCountdown()
+        await register(userData)
+        startCountdown()
 
-    //   } catch (error) {
-    //     handleRegistrationError(error)
-    //   } finally {
-    //     isLoading.value = false
-    //   }
+      } catch (error) {
+        handleRegistrationError(error)
+      } finally {
+        isLoading.value = false
+      }
     }
 
 </script>
@@ -340,5 +354,29 @@ label {
   .register-title {
     font-size: 1.5rem;
   }
+}
+.btn {
+  padding: 0.5rem 1rem;
+  font-size: 0.813rem;
+}
+.back-link {
+  margin-bottom: 1rem;
+}
+
+.back-link a {
+  display: inline-flex;
+  align-items: center;
+  color: #666;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.back-link a:hover {
+  color: #4299e1;
+}
+
+.back-link i {
+  margin-right: 0.5rem;
 }
 </style>

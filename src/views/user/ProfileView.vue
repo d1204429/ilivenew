@@ -2,7 +2,13 @@
   <div class="profile-container">
     <div class="profile-card">
       <!-- Header Section -->
+
       <div class="profile-header">
+        <div class="back-link">
+          <a @click="handleBack">
+            <i class="fas fa-arrow-left"></i> 返回
+          </a>
+        </div>
         <h2 class="title">個人資料</h2>
         <div class="action-buttons">
           <button
@@ -88,13 +94,15 @@ import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import BaseLoading from '@/components/common/BaseLoading.vue'
 import { fullName, email, phoneNumber, address } from '@/utils/validators'
-//import AuthService from '@/services/auth.service'
+import { getUser, putUser } from '@/services/users'
 
 // Lifecycle Hooks
-//onMounted(initializeProfile)
+onMounted(async()=>{
+  await fetchUserData()
+})
 
 const store = useStore()
-    const router = useRouter()
+const router = useRouter()
 
     // Form Fields Configuration
     const formFields = [
@@ -117,8 +125,14 @@ const store = useStore()
     const retryCount = ref(0)
     const MAX_RETRIES = 3
 
+const handleBack = () => {
+  if (window.history.length > 2) {
+    router.go(-1)
+  } else {
+    router.push('/')
+  }
+}
     // Computed Properties
-    //AuthService.isAuthenticated()
     const isAuthenticated = computed(() => !!store.state.accessToken)
 
     const isFormValid = computed(() => {
@@ -170,9 +184,9 @@ const store = useStore()
 
     // Form Actions
     const startEditing = () => {
-      // editedProfile.value = { ...currentUser.value }
-      // originalProfile.value = { ...currentUser.value }
-      // isEditing.value = true
+      editedProfile.value = { ...currentUser.value }
+      originalProfile.value = { ...currentUser.value }
+      isEditing.value = true
       // errors.value = {}
       // globalError.value = ''
     }
@@ -191,85 +205,40 @@ const store = useStore()
     const handleSave = async () => {
       if (!validateForm()) return
 
-      // try {
-      //   loading.value = true
-      //   globalError.value = ''
+      try {
+        loading.value = true
+        globalError.value = ''
 
-      //   const response = await AuthService.updateProfile(editedProfile.value)
-      //   if (response) {
-      //     isEditing.value = false
-      //     originalProfile.value = { ...response }
-      //     editedProfile.value = { ...response }
-      //     currentUser.value = response
-      //     store.commit('auth/SET_SUCCESS_MESSAGE', '個人資料更新成功')
-      //   }
-      // } catch (error) {
-      //   if (error.response?.status === 401) {
-      //     try {
-      //       await AuthService.refreshAccessToken()
-      //       if (retryCount.value < MAX_RETRIES) {
-      //         retryCount.value++
-      //         return handleSave()
-      //       }
-      //     } catch (refreshError) {
-      //       globalError.value = '登入已過期，請重新登入'
-      //       router.push('/login')
-      //     }
-      //   } else {
-      //     globalError.value = error.message || '更新失敗，請稍後再試'
-      //   }
-      // } finally {
-      //   loading.value = false
-      // }
+        const response = await putUser(store.state.userId, 
+        editedProfile.value.username,
+        editedProfile.value.email,
+        editedProfile.value.fullName,
+        editedProfile.value.phoneNumber,
+        editedProfile.value.address,
+        store.state.accessToken)
+        if (response) {
+          isEditing.value = false
+          await fetchUserData()
+        }
+      } catch (error) {
+        console.error('變更使用者資料失敗:', error)
+      } finally {
+        loading.value = false
+      }
     }
 
-    // Initialize Profile Data
-    const initializeProfile = async () => {
-      // try {
-      //   loading.value = true
-      //   globalError.value = ''
-
-      //   if (!AuthService.isAuthenticated()) {
-      //     router.push({
-      //       path: '/login',
-      //       query: { redirect: router.currentRoute.value.fullPath }
-      //     })
-      //     return
-      //   }
-
-      //   const userData = AuthService.getCurrentUser()
-      //   if (userData) {
-      //     currentUser.value = userData
-      //     originalProfile.value = { ...userData }
-      //     editedProfile.value = { ...userData }
-      //     retryCount.value = 0
-      //   } else {
-      //     // 如果本地沒有資料，則從伺服器獲取
-      //     const profileData = await AuthService.getProfile()
-      //     if (profileData) {
-      //       currentUser.value = profileData
-      //       originalProfile.value = { ...profileData }
-      //       editedProfile.value = { ...profileData }
-      //       retryCount.value = 0
-      //     }
-      //   }
-      // } catch (error) {
-      //   console.error('載入個人資料時發生錯誤:', error)
-      //   globalError.value = error.message || '無法載入用戶資料'
-
-      //   if (error.response?.status === 401) {
-      //     router.push({
-      //       path: '/login',
-      //       query: {
-      //         redirect: router.currentRoute.value.fullPath,
-      //         error: 'session_expired'
-      //       }
-      //     })
-      //   }
-      // } finally {
-      //   loading.value = false
-      // }
-    }
+    //使用者資料擷取
+const fetchUserData = async () => {
+  try {
+    loading.value = true
+    const data = await getUser(store.state.userId, store.state.accessToken)
+    currentUser.value = data
+  } catch (error) {
+    console.error('獲取使用者資料失敗:', error)
+  } finally {
+    loading.value = false
+  }
+}
 
     // Watchers
     watch(() => editedProfile.value, (newValue, oldValue) => {
@@ -281,65 +250,98 @@ const store = useStore()
         })
       }
     }, { deep: true })
-
-    // watch(() => AuthService.getCurrentUser(), (newUser) => {
-    //   if (newUser) {
-    //     currentUser.value = newUser
-    //   }
-    // })
 </script>
 
 <style scoped>
 .profile-container {
-  max-width: 800px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 1rem;
+  padding: 2rem;
+  background: linear-gradient(-45deg, #fff3e0, #ffe0b2, #ffecb3, #fff8e1);
+  background-size: 400% 400%;
+  animation: gradientBG 15s ease infinite;
+  min-height: 100vh;
+}
+
+@keyframes gradientBG {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 .profile-card {
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  margin-bottom: 2rem;
+  transition: all 0.3s ease;
+}
+
+.profile-card:hover {
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
 }
 
 .profile-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.25rem;
-  border-bottom: 1px solid #eee;
+  padding: 1.5rem;
+  border-bottom: 2px solid rgba(52, 152, 219, 0.3);
+  background: #ffffff;
 }
 
 .error-banner {
-  background-color: #fff5f5;
+  background-color: #fee2e2;
   color: #e53e3e;
-  padding: 0.75rem 1rem;
+  padding: 1rem;
   margin: 0.5rem;
-  border-radius: 4px;
-  border: 1px solid #feb2b2;
+  border-radius: 8px;
+  border: 1px solid #fca5a5;
 }
 
 .title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #2d3748;
+  font-size: 1.75rem;
+  font-weight: 500;
+  color: #2c3e50;
   margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  position: relative;
+}
+
+.title::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 40px;
+  height: 3px;
+  background: #3498db;
+  border-radius: 3px;
 }
 
 .profile-content {
-  padding: 1.25rem;
+  padding: 1.5rem;
+  background: #ffffff;
 }
 
 .form-group {
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
+  position: relative;
 }
 
 .form-group label {
   display: block;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #4a5568;
-  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 0.75rem;
 }
 
 .input-wrapper {
@@ -349,81 +351,82 @@ const store = useStore()
 .form-input,
 .form-textarea {
   width: 100%;
-  padding: 0.625rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  font-size: 0.875rem;
-  transition: all 0.2s ease;
-  background-color: #fff;
+  padding: 0.75rem 1rem;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background-color: #f8f9fa;
+  color: #2c3e50;
 }
 
 .form-input:focus,
 .form-textarea:focus {
-  border-color: #4299e1;
-  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.15);
+  border-color: #3498db;
+  background-color: #fff;
+  box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.15);
   outline: none;
 }
 
 .form-textarea {
-  min-height: 100px;
+  min-height: 120px;
   resize: vertical;
 }
 
 .form-text {
   display: block;
-  padding: 0.625rem;
-  background: #f7fafc;
-  border-radius: 6px;
-  font-size: 0.875rem;
-  color: #4a5568;
-  border: 1px solid #edf2f7;
+  padding: 0.75rem 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  font-size: 1rem;
+  color: #2c3e50;
+  border: 2px solid transparent;
 }
 
 .btn {
-  padding: 0.625rem 1.25rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.95rem;
   border: none;
   border-radius: 6px;
-  font-size: 0.875rem;
-  font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
 }
 
 .btn:disabled {
-  opacity: 0.6;
+  opacity: 0.7;
   cursor: not-allowed;
 }
 
 .btn:not(:disabled):hover {
-  transform: translateY(-1px);
+  transform: translateY(-2px);
 }
 
 .btn-edit {
-  background: #4299e1;
+  background: #3498db;
   color: white;
 }
 
 .btn-edit:not(:disabled):hover {
-  background: #3182ce;
+  background: #2980b9;
 }
 
 .btn-save {
-  background: #48bb78;
+  background: #2ecc71;
   color: white;
 }
 
 .btn-save:not(:disabled):hover {
-  background: #38a169;
+  background: #27ae60;
 }
 
 .btn-cancel {
-  background: #f56565;
+  background: #e74c3c;
   color: white;
-  margin-left: 0.75rem;
+  margin-left: 1rem;
 }
 
 .btn-cancel:not(:disabled):hover {
-  background: #e53e3e;
+  background: #c0392b;
 }
 
 .loading-wrapper {
@@ -434,46 +437,87 @@ const store = useStore()
 }
 
 .has-error {
-  border-color: #f56565;
+  border-color: #e74c3c;
 }
 
 .error-text {
-  color: #e53e3e;
-  font-size: 0.75rem;
-  margin-top: 0.375rem;
+  color: #e74c3c;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
   display: block;
 }
 
-/* RWD */
+.back-link {
+  margin-bottom: 1.5rem;
+}
+
+.back-link a {
+  display: inline-flex;
+  align-items: center;
+  color: #34495e;
+  font-size: 1rem;
+  cursor: pointer;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  background: #f8f9fa;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.back-link a:hover {
+  background: #e9ecef;
+  color: #2c3e50;
+  transform: translateX(-5px);
+}
+
+.back-link i {
+  margin-right: 0.5rem;
+}
+
 @media (max-width: 768px) {
   .profile-container {
-    padding: 0.75rem;
+    padding: 1rem;
   }
 
   .profile-header {
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.25rem;
     text-align: center;
+    padding: 1.25rem;
+  }
+
+  .title::after {
+    left: 50%;
+    transform: translateX(-50%);
   }
 
   .action-buttons {
     width: 100%;
     display: flex;
     justify-content: center;
-    gap: 0.75rem;
+    gap: 1rem;
   }
 
   .btn {
     flex: 1;
-    max-width: 130px;
+    max-width: 140px;
+    font-size: 0.95rem;
   }
 
   .btn-cancel {
     margin-left: 0;
   }
+
+  .title {
+    font-size: 1.5rem;
+  }
 }
 
 @media (max-width: 480px) {
+  .profile-container {
+    padding: 1rem;
+  }
+
   .profile-header {
     padding: 1rem;
   }
@@ -482,9 +526,20 @@ const store = useStore()
     padding: 1rem;
   }
 
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-input,
+  .form-textarea,
+  .form-text {
+    padding: 0.625rem 0.875rem;
+    font-size: 0.95rem;
+  }
+
   .btn {
-    padding: 0.5rem 1rem;
-    font-size: 0.813rem;
+    padding: 0.625rem 1.25rem;
+    font-size: 0.9rem;
   }
 }
 </style>
