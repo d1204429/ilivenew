@@ -303,15 +303,13 @@ const handleBack = () => {
 
 <style scoped>
 .profile-container {
-  max-width: 800px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 1rem;
-  position: relative;
-  overflow: hidden;
-  background: linear-gradient(45deg, #ffd700, #ffeda0, #ffa500);
+  padding: 2rem;
+  background: linear-gradient(-45deg, #fff3e0, #ffe0b2, #ffecb3, #fff8e1);
   background-size: 400% 400%;
   animation: gradientBG 15s ease infinite;
-  border-radius: 12px;
+  min-height: 100vh;
 }
 
 @keyframes gradientBG {
@@ -326,55 +324,16 @@ const handleBack = () => {
   }
 }
 
-/* Wave animation */
-.profile-container::before {
-  content: '';
-  position: absolute;
-  width: 200%;
-  height: 200%;
-  top: -50%;
-  left: -50%;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 40%;
-  animation: wave 15s infinite linear;
-  z-index: 1;
-}
-
-.profile-container::after {
-  content: '';
-  position: absolute;
-  width: 200%;
-  height: 200%;
-  top: -50%;
-  left: -50%;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 35%;
-  animation: wave 15s infinite linear;
-  animation-delay: -5s;
-  z-index: 1;
-}
-
-@keyframes wave {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
 .profile-card {
-  background: rgba(255, 255, 255, 0.95);
+  background: #ffffff;
   border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  position: relative;
-  z-index: 2;
-  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  margin-bottom: 2rem;
   transition: all 0.3s ease;
 }
 
 .profile-card:hover {
-  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
 }
 
 .profile-header {
@@ -382,25 +341,26 @@ const handleBack = () => {
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem;
-  border-bottom: 2px solid rgba(255, 215, 0, 0.3);
-  background: rgba(255, 255, 255, 0.9);
+  border-bottom: 2px solid rgba(52, 152, 219, 0.3);
+  background: #ffffff;
 }
 
 .error-banner {
-  background-color: rgba(229, 62, 62, 0.1);
+  background-color: #fee2e2;
   color: #e53e3e;
   padding: 1rem;
   margin: 0.5rem;
   border-radius: 8px;
-  border: 1px solid rgba(229, 62, 62, 0.3);
-  backdrop-filter: blur(4px);
+  border: 1px solid #fca5a5;
 }
 
 .title {
-  font-size: 1.5rem;
-  font-weight: 700;
+  font-size: 1.75rem;
+  font-weight: 500;
   color: #2c3e50;
   margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
   position: relative;
 }
 
@@ -411,12 +371,13 @@ const handleBack = () => {
   left: 0;
   width: 40px;
   height: 3px;
-  background: #ffd700;
+  background: #3498db;
   border-radius: 3px;
 }
 
 .profile-content {
   padding: 1.5rem;
+  background: #ffffff;
 }
 
 .form-group {
@@ -450,9 +411,9 @@ const handleBack = () => {
 
 .form-input:focus,
 .form-textarea:focus {
-  border-color: #ffd700;
+  border-color: #3498db;
   background-color: #fff;
-  box-shadow: 0 0 0 4px rgba(255, 215, 0, 0.15);
+  box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.15);
   outline: none;
 }
 
@@ -473,14 +434,11 @@ const handleBack = () => {
 
 .btn {
   padding: 0.75rem 1.5rem;
+  font-size: 0.95rem;
   border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
+  border-radius: 6px;
   cursor: pointer;
   transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
 }
 
 .btn:disabled {
@@ -492,28 +450,13 @@ const handleBack = () => {
   transform: translateY(-2px);
 }
 
-.btn::after {
-  content: '';
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: -100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: 0.5s;
-}
-
-.btn:hover::after {
-  left: 100%;
-}
-
 .btn-edit {
-  background: #2c3e50;
-  color: #ffd700;
+  background: #3498db;
+  color: white;
 }
 
 .btn-edit:not(:disabled):hover {
-  background: #34495e;
+  background: #2980b9;
 }
 
 .btn-save {
@@ -539,7 +482,7 @@ const handleBack = () => {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 3rem;
+  padding: 2rem;
 }
 
 .has-error {
@@ -551,31 +494,28 @@ const handleBack = () => {
   font-size: 0.85rem;
   margin-top: 0.5rem;
   display: block;
-  font-weight: 500;
 }
 
 .back-link {
-  margin-bottom: 1rem;
-  position: relative;
-  z-index: 2;
+  margin-bottom: 1.5rem;
 }
 
 .back-link a {
   display: inline-flex;
   align-items: center;
-  color: #2c3e50;
+  color: #34495e;
+  font-size: 1rem;
   cursor: pointer;
   text-decoration: none;
-  transition: all 0.3s ease;
-  background: white;
   padding: 0.5rem 1rem;
+  background: #f8f9fa;
   border-radius: 6px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
 }
 
 .back-link a:hover {
-  color: #ffd700;
-  background: #2c3e50;
+  background: #e9ecef;
+  color: #2c3e50;
   transform: translateX(-5px);
 }
 
@@ -583,11 +523,9 @@ const handleBack = () => {
   margin-right: 0.5rem;
 }
 
-/* RWD */
 @media (max-width: 768px) {
   .profile-container {
-    padding: 0.75rem;
-    margin: 0.75rem;
+    padding: 1rem;
   }
 
   .profile-header {
@@ -618,12 +556,15 @@ const handleBack = () => {
   .btn-cancel {
     margin-left: 0;
   }
+
+  .title {
+    font-size: 1.5rem;
+  }
 }
 
 @media (max-width: 480px) {
   .profile-container {
-    padding: 0.5rem;
-    margin: 0.5rem;
+    padding: 1rem;
   }
 
   .profile-header {

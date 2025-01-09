@@ -87,9 +87,10 @@ const handleBack = () => {
   padding: 2rem;
   position: relative;
   overflow: hidden;
-  background: linear-gradient(45deg, #ffd700, #ffeda0, #ffa500);
+  background: linear-gradient(-45deg, #fff3e0, #ffe0b2, #ffecb3, #fff8e1);
   background-size: 400% 400%;
   animation: gradientBG 15s ease infinite;
+  min-height: 100vh;
 }
 
 @keyframes gradientBG {
@@ -104,67 +105,32 @@ const handleBack = () => {
   }
 }
 
-/* Wave animation */
-.about-container::before {
-  content: '';
-  position: absolute;
-  width: 200%;
-  height: 200%;
-  top: -50%;
-  left: -50%;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 40%;
-  animation: wave 15s infinite linear;
-  z-index: 1;
-}
-
-.about-container::after {
-  content: '';
-  position: absolute;
-  width: 200%;
-  height: 200%;
-  top: -50%;
-  left: -50%;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 35%;
-  animation: wave 15s infinite linear;
-  animation-delay: -5s;
-  z-index: 1;
-}
-
-@keyframes wave {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-/* Content styles with flat design */
 .page-title {
   text-align: center;
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   color: #2c3e50;
-  font-weight: 700;
-  position: relative;
-  z-index: 2;
+  font-size: 1.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 section {
-  margin-bottom: 4rem;
-  position: relative;
-  z-index: 2;
-  background: rgba(255, 255, 255, 0.9);
-  padding: 2rem;
+  margin-bottom: 2rem;
+  background: #ffffff;
   border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  padding: 1.5rem;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 section:hover {
   transform: translateY(-5px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
 }
 
 .value-cards {
@@ -177,7 +143,7 @@ section:hover {
 .value-card {
   text-align: center;
   padding: 2rem;
-  background: #ffffff;
+  background: #f8f9fa;
   border-radius: 12px;
   transition: all 0.3s ease;
   border: 2px solid transparent;
@@ -185,13 +151,13 @@ section:hover {
 
 .value-card:hover {
   transform: translateY(-5px);
-  border-color: #ffd700;
+  border-color: #3498db;
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
 }
 
 .value-card i {
   font-size: 2.5rem;
-  color: #ffd700;
+  color: #3498db;
   margin-bottom: 1rem;
   transition: transform 0.3s ease;
 }
@@ -205,7 +171,7 @@ section:hover {
   max-width: 800px;
   margin: 0 auto;
   padding: 2rem;
-  background: rgba(255, 255, 255, 0.9);
+  background: #f8f9fa;
   border-radius: 12px;
 }
 
@@ -217,20 +183,22 @@ section:hover {
   background: white;
   border-radius: 8px;
   transition: transform 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .timeline-item:hover {
   transform: translateX(10px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .year {
   font-weight: bold;
-  color: #ffd700;
+  color: white;
   width: 80px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #2c3e50;
+  background: #3498db;
   padding: 0.5rem;
   border-radius: 6px;
 }
@@ -238,30 +206,29 @@ section:hover {
 .content {
   flex: 1;
   padding: 0.5rem;
+  color: #2c3e50;
 }
 
 .back-link {
-  margin-bottom: 1rem;
-  position: relative;
-  z-index: 2;
+  margin-bottom: 1.5rem;
 }
 
 .back-link a {
   display: inline-flex;
   align-items: center;
-  color: #2c3e50;
+  color: #34495e;
+  font-size: 1rem;
   cursor: pointer;
   text-decoration: none;
-  transition: all 0.3s ease;
-  background: white;
   padding: 0.5rem 1rem;
+  background: #f8f9fa;
   border-radius: 6px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
 }
 
 .back-link a:hover {
-  color: #ffd700;
-  background: #2c3e50;
+  background: #e9ecef;
+  color: #2c3e50;
   transform: translateX(-5px);
 }
 
@@ -269,8 +236,41 @@ section:hover {
   margin-right: 0.5rem;
 }
 
-/* Responsive styles */
+h2 {
+  color: #2c3e50;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+  position: relative;
+  padding-bottom: 0.5rem;
+}
+
+h2::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 50px;
+  height: 3px;
+  background: #3498db;
+  border-radius: 3px;
+}
+
+h3 {
+  color: #2c3e50;
+  margin: 1rem 0;
+  font-weight: 500;
+}
+
+p {
+  color: #34495e;
+  line-height: 1.6;
+}
+
 @media (max-width: 768px) {
+  .about-container {
+    padding: 1rem;
+  }
+
   .value-cards {
     grid-template-columns: 1fr;
   }
@@ -287,36 +287,13 @@ section:hover {
   .year {
     width: 100%;
   }
-}
 
-/* Typography */
-h2 {
-  color: #2c3e50;
-  margin-bottom: 1.5rem;
-  font-weight: 600;
-  position: relative;
-  padding-bottom: 0.5rem;
-}
+  .page-title {
+    font-size: 1.5rem;
+  }
 
-h2::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 50px;
-  height: 3px;
-  background: #ffd700;
-  border-radius: 3px;
-}
-
-h3 {
-  color: #2c3e50;
-  margin: 1rem 0;
-  font-weight: 500;
-}
-
-p {
-  color: #34495e;
-  line-height: 1.6;
+  section {
+    padding: 1rem;
+  }
 }
 </style>
